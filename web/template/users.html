@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+    <h1>Users</h1>
+    <ul>
+        {{range .}}
+        <li>
+            Username: {{.Username}}, Created At: {{.CreatedAt}}
+        </li>
+        {{else}}
+        <li>No users found.</li>
+        {{end}}
+    </ul>
+</body>
+</html>
