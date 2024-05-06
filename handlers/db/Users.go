@@ -7,12 +7,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type User struct {
-	ID           int
-	Username     string
-	PasswordHash string
-	CreatedAt    string
-}
 
 func CreateUser(db *sql.DB, username, password string) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

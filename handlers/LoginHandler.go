@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"literary-lions-forum/handlers/db"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -62,4 +63,25 @@ func GetUserIDFromSession(r *http.Request) (int, error) {
 		return 0, err // Ошибка, если значение не является целым числом
 	}
 	return userID, nil
+}
+
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Logout requested with method: %s", r.Method)
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Удаление сессионной куки
+	cookie := http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		Secure:   false, // Включите для HTTPS
+	}
+	http.SetCookie(w, &cookie)
+
+	// Перенаправление на страницу входа или на главную страницу
+	http.Redirect(w, r, "/", http.StatusFound)
 }

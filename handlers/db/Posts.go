@@ -5,27 +5,15 @@ import (
 	"fmt"
 )
 
-func CreatePost(db *sql.DB, title, content string, authorID int) error {
-	stmt, err := db.Prepare("INSERT INTO posts (title, content, author_id) VALUES (?, ?, ?)")
+func CreatePost(db *sql.DB, title, content string, authorID, categoryID int) error {
+	stmt, err := db.Prepare("INSERT INTO posts (title, content, author_id, category_id) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(title, content, authorID)
+	_, err = stmt.Exec(title, content, authorID, categoryID)
 	return err
-}
-
-type Post struct {
-	ID         int
-	Title      string
-	Content    string
-	AuthorID   sql.NullString
-	AuthorName string
-	CreatedAt  string
-	Comments   []Comment
-	Likes      int // количество лайков
-	Dislikes   int
 }
 
 func GetAllPosts(db *sql.DB) ([]Post, error) {

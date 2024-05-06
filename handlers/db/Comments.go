@@ -2,11 +2,7 @@ package db
 
 import "database/sql"
 
-type Comment struct {
-	AuthorName string
-	Content    string
-	CreatedAt  string
-}
+
 
 func GetCommentsForPost(db *sql.DB, postID int) ([]Comment, error) {
 	query := `

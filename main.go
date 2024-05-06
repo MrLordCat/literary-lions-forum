@@ -10,9 +10,14 @@ import (
 func main() {
 	database := db.InitDB()
 	defer database.Close()
-	http.HandleFunc("/", server.MainPage)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		server.MainPage(database, w, r)
+	})
+	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UserProfileHandler(database, w, r)
+	})
 	http.HandleFunc("/create-post", func(w http.ResponseWriter, r *http.Request) {
-		handlers.CreatePostHandler(database, w, r)
+		handlers.PostCreateFormHandler(database, w, r)
 	})
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		handlers.RegisterHandler(database, w, r)
@@ -32,6 +37,12 @@ func main() {
 	http.HandleFunc("/like", func(w http.ResponseWriter, r *http.Request) {
 		handlers.LikeHandler(database, w, r)
 	})
-
-	http.ListenAndServe("0.0.0.0:8000", nil)
+	http.HandleFunc("/create-category", func(w http.ResponseWriter, r *http.Request) {
+		handlers.CreateCategoryHandler(database, w, r)
+	})
+	http.HandleFunc("/user/", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UserViewHandler(database, w, r)
+	})
+	http.HandleFunc("/logout", handlers.LogoutHandler)
+	http.ListenAndServe("0.0.0.0:8100", nil)
 }
