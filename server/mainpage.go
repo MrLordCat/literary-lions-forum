@@ -16,8 +16,11 @@ func MainPage(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch categories", http.StatusInternalServerError)
 		return
 	}
-
-	// Проверка аутентификации пользователя
+	posts, err := db.GetAllPosts(dbConn, 0, 0)
+	if err != nil {
+		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
+		return
+	}
 	userID, err := handlers.GetUserIDFromSession(r)
 	loggedIn := err == nil && userID != 0 // пользователь считается вошедшим в систему, если нет ошибки и userID не 0
 
@@ -26,6 +29,7 @@ func MainPage(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, map[string]interface{}{
 		"Categories": categories,
 		"LoggedIn":   loggedIn, // Передаем статус аутентификации в шаблон
+		"Posts":      posts,
 	})
 	if err != nil {
 		http.Error(w, "Failed to render template", http.StatusInternalServerError)

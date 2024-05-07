@@ -1,22 +1,25 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"time"
+)
 
 type User struct {
 	ID           int
 	Username     string
 	PasswordHash string
 	CreatedAt    string
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
+	FirstName    sql.NullString
+	LastName     sql.NullString
 }
 type Post struct {
 	ID         int
 	Title      string
 	Content    string
-	AuthorID   sql.NullString
+	AuthorID   int
 	AuthorName string
-	CreatedAt  string
+	CreatedAt  time.Time
 	CategoryID sql.NullString
 	Comments   []Comment
 	Likes      int

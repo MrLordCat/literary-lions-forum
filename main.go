@@ -10,6 +10,8 @@ import (
 func main() {
 	database := db.InitDB()
 	defer database.Close()
+	fileServer := http.FileServer(http.Dir("web/template/static"))
+	http.Handle("/static/", http.StripPrefix("/static", fileServer))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		server.MainPage(database, w, r)
 	})
@@ -42,6 +44,21 @@ func main() {
 	})
 	http.HandleFunc("/user/", func(w http.ResponseWriter, r *http.Request) {
 		handlers.UserViewHandler(database, w, r)
+	})
+	http.HandleFunc("/profileEdit/", func(w http.ResponseWriter, r *http.Request) {
+		handlers.ProfileEditHandler(database, w, r)
+	})
+	http.HandleFunc("/updateProfile", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UpdateProfileHandler(database, w, r)
+	})
+	http.HandleFunc("/postView", func(w http.ResponseWriter, r *http.Request) {
+		handlers.PostViewHandler(database, w, r)
+	})
+	http.HandleFunc("/editPost", func(w http.ResponseWriter, r *http.Request) {
+		handlers.EditPostHandler(database, w, r)
+	})
+	http.HandleFunc("/updatePost", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UpdatePostHandler(database, w, r)
 	})
 	http.HandleFunc("/logout", handlers.LogoutHandler)
 	http.ListenAndServe("0.0.0.0:8100", nil)

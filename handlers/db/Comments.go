@@ -2,8 +2,6 @@ package db
 
 import "database/sql"
 
-
-
 func GetCommentsForPost(db *sql.DB, postID int) ([]Comment, error) {
 	query := `
     SELECT c.content, cu.username, c.created_at

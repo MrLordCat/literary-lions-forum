@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Profile</title>
+</head>
+<body>
+    <h1>Edit Profile</h1>
+    <form action="/updateProfile" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" value="{{.User.Username}}" required><br>
+        
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" value="{{if .User.FirstName.Valid}}{{.User.FirstName.String}}{{end}}" ><br>
+        
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" value="{{if .User.LastName.Valid}}{{.User.LastName.String}}{{end}}" ><br>
+        
+        <label for="currentPassword">Current Password:</label>
+        <input type="password" id="currentPassword" name="currentPassword" required><br>
+        
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" name="newPassword" required><br>
+        
+        <label for="confirmPassword">Confirm New Password:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required><br>
+        
+        <button type="submit">Update Profile</button>
+        
+        
+        <button type="submit">Update Profile</button>
+    </form>
+    <a href="/profile"><button>Cancel</button></a>
+</body>
+</html>

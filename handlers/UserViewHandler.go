@@ -45,7 +45,7 @@ func UserViewHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch liked posts", http.StatusInternalServerError)
 		return
 	}
-	tmpl := template.Must(template.ParseFiles("web/template/profile.html"))
+	tmpl := template.Must(template.ParseFiles("web/template/viewProfile.html"))
 	err = tmpl.Execute(w, map[string]interface{}{
 		"User":       user,
 		"UserPosts":  userPosts,

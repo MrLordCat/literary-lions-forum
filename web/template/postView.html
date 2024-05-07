@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post View</title>
+    <a href="/"><button> Home</button></a>
+</head>
+<body>
+    <h1>{{.Post.Title}}</h1>
+    <p>{{.Post.Content}}</p>
+    <p>Posted by: {{.Post.AuthorName}} at {{.Post.CreatedAt}}</p>
+
+    <!-- Проверяем, можно ли редактировать пост -->
+
+    <a href="/editPost?postID={{.Post.ID}}"><button>Edit Post</button></a>
+
+
+    <h2>Comments</h2>
+    {{if .Comments}}
+    <ul>
+        {{range .Comments}}
+        <li>{{.AuthorName}} said: {{.Content}}</li>
+        {{end}}
+    </ul>
+    {{else}}
+    <p>No comments yet.</p>
+    {{end}}
+    <a href="/posts"><button>Back to Posts</button></a>
+</body>
+</html>
