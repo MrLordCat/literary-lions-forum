@@ -49,3 +49,4 @@ func AddCommentHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	// Перенаправление обратно на страницу постов
 	http.Redirect(w, r, "/posts", http.StatusFound)
 }
+

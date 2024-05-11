@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"database/sql"
+	"literary-lions-forum/handlers/db"
 	"net/http"
 	"strconv"
 )
 
-func LikeHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func LikeHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -30,7 +31,7 @@ func LikeHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = AddOrUpdateLike(db, postID, userID, likeType)
+	err = db.AddOrUpdateLike(dbConn, postID, userID, likeType)
 	if err != nil {
 		http.Error(w, "Failed to update like/dislike", http.StatusInternalServerError)
 		return
@@ -39,20 +40,38 @@ func LikeHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/posts", http.StatusFound)
 }
 
-func AddOrUpdateLike(db *sql.DB, postID, userID, likeType int) error {
-	// Check if the user has already liked or disliked the post
-	var existingType int
-	err := db.QueryRow("SELECT like_type FROM post_likes WHERE post_id = ? AND user_id = ?", postID, userID).Scan(&existingType)
-	if err != nil && err != sql.ErrNoRows {
-		return err
+func LikeCommentHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
-	if err == sql.ErrNoRows {
-		// No existing like/dislike, insert new
-		_, err = db.Exec("INSERT INTO post_likes (post_id, user_id, like_type) VALUES (?, ?, ?)", postID, userID, likeType)
-	} else if existingType != likeType {
-		// Existing like/dislike differs, update it
-		_, err = db.Exec("UPDATE post_likes SET like_type = ? WHERE post_id = ? AND user_id = ?", likeType, postID, userID)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Error parsing form", http.StatusBadRequest)
+		return
 	}
-	return err
+
+	commentID, err := strconv.Atoi(r.FormValue("comment_id"))
+	if err != nil {
+		http.Error(w, "Invalid comment ID", http.StatusBadRequest)
+		return
+	}
+
+	authorID, err := strconv.Atoi(r.FormValue("author_id")) // Используйте author_id здесь
+	if err != nil {
+		http.Error(w, "Invalid author ID", http.StatusBadRequest)
+		return
+	}
+
+	likeType, err := strconv.Atoi(r.FormValue("like_type"))
+	if err != nil {
+		http.Error(w, "Invalid like type", http.StatusBadRequest)
+		return
+	}
+
+	if err := db.LikeComment(dbConn, commentID, authorID, likeType); err != nil {
+		http.Error(w, "Failed to like comment: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusFound)
 }

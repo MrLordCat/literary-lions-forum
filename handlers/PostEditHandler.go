@@ -52,15 +52,22 @@ func UpdatePostHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	title := r.FormValue("title")
-	content := r.FormValue("content")
-
-	// Обновляем пост в базе данных
-	if err := db.UpdatePost(dbConn, postID, title, content); err != nil {
-		http.Error(w, "Failed to update post", http.StatusInternalServerError)
+	if r.FormValue("action") == "delete" {
+		// Обрабатываем удаление поста
+		if err := db.UpdateOrDeletePost(dbConn, postID, "", "", true); err != nil {
+			http.Error(w, "Failed to delete post", http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
 
-	// Перенаправляем пользователя обратно к просмотру поста
+	// Обрабатываем обновление поста
+	title := r.FormValue("title")
+	content := r.FormValue("content")
+	if err := db.UpdateOrDeletePost(dbConn, postID, title, content, false); err != nil {
+		http.Error(w, "Failed to update post", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/postView?postID="+strconv.Itoa(int(postID)), http.StatusFound)
 }

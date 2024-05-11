@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"html/template"
 	"literary-lions-forum/handlers/db"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -43,7 +44,8 @@ func PostViewHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post not found", http.StatusNotFound)
 		return
 	}
-	post := posts[0] // Получаем первый и единственный пост из списка
+	post := posts[0]
+	log.Printf("Post data: %+v", post)
 
 	comments, err := db.GetCommentsForPost(dbConn, int(postID))
 	if err != nil {
@@ -57,7 +59,9 @@ func PostViewHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 		"Comments": comments,
 	})
 	if err != nil {
-		http.Error(w, "Failed to render template", http.StatusInternalServerError)
-		return // Убедитесь, что добавили return здесь
+		log.Printf("Error: %v", err) // Добавьте логирование ошибки
+		http.Error(w, "Failed to fetch post", http.StatusInternalServerError)
+		return
 	}
+
 }

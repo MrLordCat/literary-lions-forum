@@ -19,7 +19,11 @@ func UserProfileHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Failed to fetch user data", http.StatusInternalServerError)
 		return
 	}
-
+	karma, err := db.CalculateUserKarma(dbConn, userID)
+	if err != nil {
+		http.Error(w, "Failed to calculate karma", http.StatusInternalServerError)
+		return
+	}
 	userPosts, err := db.GetUserPosts(dbConn, userID) // Загрузка постов пользователя
 	if err != nil {
 		http.Error(w, "Failed to fetch user posts", http.StatusInternalServerError)
@@ -36,6 +40,7 @@ func UserProfileHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) 
 	tmpl := template.Must(template.ParseFiles("web/template/profile.html"))
 	err = tmpl.Execute(w, map[string]interface{}{
 		"User":       user,
+		"Karma":      karma,
 		"UserPosts":  userPosts,
 		"LikedPosts": likedPosts,
 	})

@@ -1,14 +1,19 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 func GetCommentsForPost(db *sql.DB, postID int) ([]Comment, error) {
 	query := `
-    SELECT c.content, cu.username, c.created_at
+    SELECT c.id, c.content, cu.username, c.created_at, COALESCE(SUM(cl.like_type), 0) AS likes
     FROM comments c
     JOIN users cu ON c.author_id = cu.id
+    LEFT JOIN comment_likes cl ON c.id = cl.comment_id
     WHERE c.post_id = ?
-    ORDER BY c.created_at
+    GROUP BY c.id
+    ORDER BY c.created_at DESC
     `
 	rows, err := db.Query(query, postID)
 	if err != nil {
@@ -19,10 +24,29 @@ func GetCommentsForPost(db *sql.DB, postID int) ([]Comment, error) {
 	var comments []Comment
 	for rows.Next() {
 		var c Comment
-		if err := rows.Scan(&c.Content, &c.AuthorName, &c.CreatedAt); err != nil {
+		if err := rows.Scan(&c.ID, &c.Content, &c.AuthorName, &c.CreatedAt, &c.Likes); err != nil {
 			return nil, err
 		}
 		comments = append(comments, c)
 	}
 	return comments, nil
+}
+
+func DeleteOrUpdateComment(db *sql.DB, commentID int64, newContent string, delete bool) error {
+	if delete {
+		// Если delete == true, удаляем комментарий
+		query := `DELETE FROM comments WHERE id = ?`
+		_, err := db.Exec(query, commentID)
+		if err != nil {
+			return fmt.Errorf("error deleting comment: %v", err)
+		}
+	} else {
+		// Если delete == false, обновляем комментарий
+		query := `UPDATE comments SET content = ? WHERE id = ?`
+		_, err := db.Exec(query, newContent, commentID)
+		if err != nil {
+			return fmt.Errorf("error updating comment: %v", err)
+		}
+	}
+	return nil
 }

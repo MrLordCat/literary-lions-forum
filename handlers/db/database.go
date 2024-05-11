@@ -33,6 +33,7 @@ func CreateTables(db *sql.DB) {
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		username TEXT UNIQUE NOT NULL,
+		email TEXT UNIQUE NOT NULL,
 		password_hash TEXT NOT NULL,
 		first_name TEXT DEFAULT '',
 		last_name TEXT DEFAULT '',
@@ -47,6 +48,14 @@ func CreateTables(db *sql.DB) {
 		FOREIGN KEY (post_id) REFERENCES posts(id),
 		FOREIGN KEY (author_id) REFERENCES users(id)
 	);
+	CREATE TABLE IF NOT EXISTS comment_likes (
+		comment_id INTEGER NOT NULL,
+		user_id INTEGER NOT NULL,
+		like_type INTEGER NOT NULL,  -- 1 для лайка, -1 для дизлайка
+		PRIMARY KEY (comment_id, user_id),
+		FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+	);
 	CREATE TABLE IF NOT EXISTS post_likes (
 		post_id INTEGER NOT NULL,
 		user_id INTEGER NOT NULL,
@@ -55,6 +64,12 @@ func CreateTables(db *sql.DB) {
 		FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
 		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 	);
+	CREATE TABLE IF NOT EXISTS categories (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		description TEXT DEFAULT ''
+	);
+
 	`
 
 	_, err := db.Exec(query)

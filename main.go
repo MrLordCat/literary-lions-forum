@@ -60,6 +60,12 @@ func main() {
 	http.HandleFunc("/updatePost", func(w http.ResponseWriter, r *http.Request) {
 		handlers.UpdatePostHandler(database, w, r)
 	})
+	http.HandleFunc("/like-comment", func(w http.ResponseWriter, r *http.Request) {
+		handlers.LikeCommentHandler(database, w, r)
+	})
+	http.HandleFunc("/updateComment", func(w http.ResponseWriter, r *http.Request) {
+		handlers.EditCommentHandler(database, w, r)
+	})
 	http.HandleFunc("/logout", handlers.LogoutHandler)
 	http.ListenAndServe("0.0.0.0:8100", nil)
 }

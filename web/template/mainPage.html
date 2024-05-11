@@ -41,17 +41,20 @@
     <div>
         <h1>Login</h1>
         <form method="POST" action="/login">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username"><br>
+            <label for="login">Username or Email:</label>
+            <input type="text" id="login" name="login" required><br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required><br>
             <button type="submit">Login</button>
         </form>
+        
 
         <h1>Register</h1>
         <form method="POST" action="/register">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required><br>
             <button type="submit">Register</button>
@@ -68,42 +71,44 @@
     <div class="post">
         <h2><a href="/postView?postID={{.ID}}">{{.Title}}</a></h2>
         <p>{{.Content}}</p>
-        <div>
-            Likes: {{.Likes}}, Dislikes: {{.Dislikes}}
-            <form method="POST" action="/like">
-                <input type="hidden" name="post_id" value="{{.ID}}">
-                <input type="hidden" name="like_type" value="1">
-                <button type="submit" class="like-button">Like</button>
-            </form>
-            <form method="POST" action="/like">
-                <input type="hidden" name="post_id" value="{{.ID}}">
-                <input type="hidden" name="like_type" value="-1">
-                <button type="submit" class="dislike-button">Dislike</button>
-            </form>
-        </div>
-        <small>Posted by {{if ne .AuthorID 0}}
-            <a href="/user/{{.AuthorID}}">{{.AuthorName}}</a>
-            {{else}}
-            {{.AuthorName}}
-            {{end}} at {{.CreatedAt}}</small>
+        <div>Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</div>
+        <small>Posted by {{.AuthorName}} at {{.CreatedAt}}</small>
         <h3>Comments:</h3>
         {{if .Comments}}
         <ul>
             {{range .Comments}}
-            <li>{{.AuthorName}} said: {{.Content}} <br><small>{{.CreatedAt}}</small></li>
+            <li>
+                <form method="POST" action="/updateComment">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="comment_id" value="{{.ID}}">
+                    <input type="text" name="content" value="{{.Content}}">
+                    <button type="submit">Save</button>
+                </form>
+                <form method="POST" action="/updateComment">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="comment_id" value="{{.ID}}">
+                    <button type="submit">Delete</button>
+                </form>
+                {{else}}
+                {{.Content}}
+                {{end}}
+                <br><small>Posted at {{.CreatedAt}}</small>
+                {{if eq .AuthorID $.UserID}}
+
+                {{end}}
+            </li>
+            
             {{end}}
         </ul>
+        <form method="POST" action="/add-comment">
+            <input type="hidden" name="post_id" value="{{.ID}}">
+            <textarea name="content" required placeholder="Add a comment..."></textarea>
+            <button type="submit">Comment</button>
+        </form>
         {{else}}
         <p>No comments yet.</p>
         {{end}}
-        <form method="POST" action="/add-comment">
-            <input type="hidden" name="post_id" value="{{.ID}}">
-            <textarea name="content" required placeholder="Add a comment..."></textarea><br>
-            <button type="submit">Comment</button>
-        </form>
     </div>
-    {{else}}
-    <p>No posts found.</p>
-    {{end}}
+
 </body>
 </html>

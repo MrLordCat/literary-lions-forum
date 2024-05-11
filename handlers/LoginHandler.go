@@ -17,21 +17,22 @@ func LoginHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Парсинг входных данных пользователя
-	username := r.FormValue("username")
+	login := r.FormValue("login")
 	password := r.FormValue("password")
 
-	// Попытка найти пользователя в базе данных
-	user, err := db.GetUserByUsername(dbConn, username)
+	user, err := db.GetUserByUsernameOrEmail(dbConn, login)
 	if err != nil {
-		http.Error(w, "User not found", http.StatusBadRequest)
+		if err == sql.ErrNoRows {
+			http.Error(w, "User not found", http.StatusBadRequest)
+		} else {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+		}
 		return
 	}
 
 	// Сравнение предоставленного пароля с хэшированным паролем в базе данных
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		// Если пароли не совпадают, отправляется сообщение об ошибке
 		http.Error(w, "Invalid password", http.StatusUnauthorized)
 		return
 	}
@@ -40,8 +41,9 @@ func LoginHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
 	setSession(user.ID, w)
 
 	// Перенаправление пользователя на главную страницу или страницу профиля
-	http.Redirect(w, r, "/profile", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
+
 func setSession(userID int, w http.ResponseWriter) {
 	expiration := time.Now().Add(24 * time.Hour)
 	cookie := http.Cookie{

@@ -8,12 +8,13 @@
 <body>
     <h1>Hello, {{.User.Username}}!</h1>
      <p>Name: {{if .User.FirstName.Valid}}{{.User.FirstName.String}} {{end}}{{if .User.LastName.Valid}}{{.User.LastName.String}}{{end}}</p>
+     <p>Karma: {{.Karma}}</p>
 <a href="/profileEdit"><button>Edit Profile</button></a>
     <h2>Your Posts</h2>
     {{if .UserPosts}}
         <ul>
             {{range .UserPosts}}
-                <li>{{.Title}} - {{.Content}}</li>
+                <li><a href="/postView?postID={{.ID}}">{{.Title}}TEST</a></li>
             {{end}}
         </ul>
     {{else}}
