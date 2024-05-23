@@ -1,20 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+{{define "content"}}
     <a href="/"><button> Home</button></a>
     <title>User Profile</title>
-</head>
-<body>
-    <h1>Hello, {{.User.Username}}!</h1>
-     <p>Name: {{if .User.FirstName.Valid}}{{.User.FirstName.String}} {{end}}{{if .User.LastName.Valid}}{{.User.LastName.String}}{{end}}</p>
-     <p>Karma: {{.Karma}}</p>
-<a href="/profileEdit"><button>Edit Profile</button></a>
+    <h1>{{.User.Username}}</h1>
+    <p>Name: {{if .User.FirstName.Valid}}{{.User.FirstName.String}}{{else}}Not provided{{end}} {{if .User.LastName.Valid}}{{.User.LastName.String}}{{else}}{{end}}</p>
     <h2>Your Posts</h2>
     {{if .UserPosts}}
         <ul>
             {{range .UserPosts}}
-                <li><a href="/postView?postID={{.ID}}">{{.Title}}TEST</a></li>
+                <li>{{.Title}} - {{.Content}}</li>
             {{end}}
         </ul>
     {{else}}
@@ -31,5 +24,4 @@
     {{else}}
         <p>No liked posts to display.</p>
     {{end}}
-</body>
-</html>
+{{end}}

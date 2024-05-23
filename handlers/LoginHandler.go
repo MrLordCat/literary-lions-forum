@@ -11,39 +11,40 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func LoginHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	login := r.FormValue("login")
-	password := r.FormValue("password")
-
-	user, err := db.GetUserByUsernameOrEmail(dbConn, login)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			http.Error(w, "User not found", http.StatusBadRequest)
-		} else {
-			http.Error(w, "Database error", http.StatusInternalServerError)
+func LoginHandler(dbConn *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
 		}
-		return
+
+		login := r.FormValue("login")
+		password := r.FormValue("password")
+
+		user, err := db.GetUserByUsernameOrEmail(dbConn, login)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				http.Error(w, "User not found", http.StatusBadRequest)
+			} else {
+				http.Error(w, "Database error", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		// Сравнение предоставленного пароля с хэшированным паролем в базе данных
+		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+		if err != nil {
+			http.Error(w, "Invalid password", http.StatusUnauthorized)
+			return
+		}
+
+		// Установка сессии для пользователя после успешного входа
+		setSession(user.ID, w)
+
+		// Перенаправление пользователя на главную страницу или страницу профиля
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
-
-	// Сравнение предоставленного пароля с хэшированным паролем в базе данных
-	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
-	if err != nil {
-		http.Error(w, "Invalid password", http.StatusUnauthorized)
-		return
-	}
-
-	// Установка сессии для пользователя после успешного входа
-	setSession(user.ID, w)
-
-	// Перенаправление пользователя на главную страницу или страницу профиля
-	http.Redirect(w, r, "/", http.StatusFound)
 }
-
 func setSession(userID int, w http.ResponseWriter) {
 	expiration := time.Now().Add(24 * time.Hour)
 	cookie := http.Cookie{

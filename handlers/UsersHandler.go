@@ -7,13 +7,15 @@ import (
 	"text/template"
 )
 
-func UsersHandler(dbConn *sql.DB, w http.ResponseWriter, r *http.Request) {
-	users, err := db.GetAllUsers(dbConn)
-	if err != nil {
-		http.Error(w, "Failed to fetch users", http.StatusInternalServerError)
-		return
-	}
+func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		users, err := db.GetAllUsers(dbConn)
+		if err != nil {
+			http.Error(w, "Failed to fetch users", http.StatusInternalServerError)
+			return
+		}
 
-	tmpl := template.Must(template.ParseFiles("web/template/users.html"))
-	tmpl.Execute(w, users)
+		tmpl := template.Must(template.ParseFiles("web/template/users.html"))
+		tmpl.Execute(w, users)
+	}
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sorted Posts by Category</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>Posts Sorted by Category: {{.CategoryName}}</h1>
+
+    {{range .Posts}}
+    <div class="post">
+        <h2><a href="/postView?postID={{.ID}}">{{.Title}}</a></h2>
+        <p>{{.Content}}</p>
+        <div>Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</div>
+        <small>Posted by {{.AuthorName}} at {{.CreatedAt}}</small>
+        <h3>Comments:</h3>
+        {{if .Comments}}
+        <ul>
+            {{range .Comments}}
+            <li>
+                {{.Content}}
+                <br><small>Posted at {{.CreatedAt}}</small>
+            </li>
+            {{end}}
+        </ul>
+        {{else}}
+        <p>No comments yet.</p>
+        {{end}}
+    </div>
+    {{else}}
+    <p>No posts available in this category.</p>
+    {{end}}
+    
+    <div>
+        <a href="/"><button>Back to Home</button></a>
+    </div>
+</body>
+</html>

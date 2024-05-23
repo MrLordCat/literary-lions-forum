@@ -1,0 +1,29 @@
+{{define "content"}}
+    <h1>Search Results</h1>
+
+    <h2>Posts</h2>
+    {{if .Results.Posts}}
+        {{range .Results.Posts}}
+            <div class="post">
+                <h3><a href="/postView?postID={{.ID}}">{{.Title}}</a></h3>
+                <p>{{.Content}}</p>
+            </div>
+        {{end}}
+    {{else}}
+        <p>No posts found.</p>
+    {{end}}
+
+    <h2>Users</h2>
+    {{if .Results.Users}}
+        {{range .Results.Users}}
+            <div class="user">
+                <h3><a href="/user/{{.ID}}">{{.Username}}</a></h3>
+                <p>Email: {{.Email}}</p>
+            </div>
+        {{end}}
+    {{else}}
+        <p>No users found.</p>
+    {{end}}
+
+    <a href="/"><button>Back to Home</button></a>
+{{end}}

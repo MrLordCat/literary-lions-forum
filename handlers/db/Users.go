@@ -55,3 +55,13 @@ func GetAllUsers(db *sql.DB) ([]User, error) {
 	}
 	return users, nil
 }
+func CheckCurrentPassword(db *sql.DB, userID int, currentPassword string) bool {
+	var hashedPassword string
+	err := db.QueryRow(`SELECT password_hash FROM users WHERE id = ?`, userID).Scan(&hashedPassword)
+	if err != nil {
+		return false
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(currentPassword))
+	return err == nil
+}

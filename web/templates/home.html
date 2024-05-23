@@ -1,0 +1,94 @@
+{{define "content"}}
+    <h1>Welcome to the Book Forum</h1>
+
+    {{if .LoggedIn}}
+        <div>
+            <h2>Create New Category</h2>
+            <form method="POST" action="/create-category">
+                <label for="categoryName">Category Name:</label>
+                <input type="text" id="categoryName" name="categoryName" required><br>
+                <button type="submit">Create Category</button>
+            </form>
+
+            <h2>Create New Post</h2>
+            <form method="POST" action="/create-post">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required><br>
+                <label for="content">Content:</label>
+                <textarea id="content" name="content" required></textarea><br>
+                <label for="category">Category:</label>
+                <select id="category" name="category_id">
+                    {{range .Categories}}
+                        <option value="{{.ID}}">{{.Name}}</option>
+                    {{end}}
+                </select><br>
+                <button type="submit">Create Post</button>
+            </form>
+
+            <h2>View Posts by Category</h2>
+            <form action="/sortedPosts" method="get">
+                <label for="category">Choose a Category:</label>
+                <select id="category" name="category_id">
+                    {{range .Categories}}
+                        <option value="{{.ID}}">{{.Name}}</option>
+                    {{end}}
+                </select><br>
+                <button type="submit">View Posts</button>
+            </form>
+
+            <form method="GET" action="/search">
+                <input type="text" name="query" placeholder="Search posts and users..." required>
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    {{else}}
+        <div>
+            <h1>Login</h1>
+            <form method="POST" action="/login">
+                <label for="login">Username or Email:</label>
+                <input type="text" id="login" name="login" required><br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required><br>
+                <button type="submit">Login</button>
+            </form>
+
+            <h1>Register</h1>
+            <form method="POST" action="/register">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required><br>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required><br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required><br>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    {{end}}
+
+    <h1>Posts</h1>
+    {{range .Posts}}
+        <div class="post">
+            <h2><a href="/postView?postID={{.ID}}">{{.Title}}</a></h2>
+            <p>{{.Content}}</p>
+            <div>Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</div>
+            <small>Posted by {{.AuthorName}} at {{.CreatedAt}}</small>
+            <h3>Comments:</h3>
+            {{if .Comments}}
+                <ul>
+                    {{range .Comments}}
+                        <li>
+                            {{.Content}}<br><small>Posted at {{.CreatedAt}}</small>
+                        </li>
+                    {{end}}
+                </ul>
+            {{else}}
+                <p>No comments yet.</p>
+            {{end}}
+            <form method="POST" action="/add-comment">
+                <input type="hidden" name="post_id" value="{{.ID}}">
+                <textarea name="content" required placeholder="Add a comment..."></textarea>
+                <button type="submit">Comment</button>
+            </form>
+        </div>
+    {{end}}
+{{end}}

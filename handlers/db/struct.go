@@ -10,7 +10,7 @@ type User struct {
 	Username     string
 	Email        string
 	PasswordHash string
-	CreatedAt    string
+	CreatedAt    time.Time
 	FirstName    sql.NullString
 	LastName     sql.NullString
 }
@@ -32,11 +32,22 @@ type Comment struct {
 	ID         int
 	AuthorName string
 	Content    string
-	CreatedAt  string
+	CreatedAt  time.Time
 	Likes      int // Добавляем поле для хранения количества лайков
 }
 
 type Category struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+}
+type SearchResult struct {
+	Posts []Post
+	Users []User
+}
+type Notification struct {
+	ID        int
+	UserID    int
+	Content   string
+	IsRead    int
+	CreatedAt string
 }

@@ -1,0 +1,29 @@
+{{define "content"}}
+    <h1>{{.User.Username}}'s Profile</h1>
+    <p>Email: {{.User.Email}}</p>
+    <p>Karma: {{.Karma}}</p>
+
+    <h2>Your Posts</h2>
+    {{if .UserPosts}}
+        <ul>
+            {{range .UserPosts}}
+                <li><a href="/postView?postID={{.ID}}">{{.Title}}</a></li>
+            {{end}}
+        </ul>
+    {{else}}
+        <p>You have not posted anything yet.</p>
+    {{end}}
+
+    <h2>Liked Posts</h2>
+    {{if .LikedPosts}}
+        <ul>
+            {{range .LikedPosts}}
+                <li><a href="/postView?postID={{.ID}}">{{.Title}}</a></li>
+            {{end}}
+        </ul>
+    {{else}}
+        <p>You have not liked any posts yet.</p>
+    {{end}}
+
+    <a href="/profileEdit"><button>Edit Profile</button></a>
+{{end}}

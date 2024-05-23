@@ -5,67 +5,55 @@ import (
 	"literary-lions-forum/handlers/db"
 	"literary-lions-forum/server"
 	"net/http"
+	"path/filepath"
+	"text/template"
+
+	"github.com/gorilla/mux"
 )
 
+func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+	templates := template.Must(template.ParseFiles(
+		filepath.Join("web/templates", "base.html"),
+		filepath.Join("web/templates", tmpl),
+	))
+	err := templates.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
 func main() {
 	database := db.InitDB()
 	defer database.Close()
-	fileServer := http.FileServer(http.Dir("web/template/static"))
-	http.Handle("/static/", http.StripPrefix("/static", fileServer))
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		server.MainPage(database, w, r)
-	})
-	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
-		handlers.UserProfileHandler(database, w, r)
-	})
-	http.HandleFunc("/create-post", func(w http.ResponseWriter, r *http.Request) {
-		handlers.PostCreateFormHandler(database, w, r)
-	})
-	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		handlers.RegisterHandler(database, w, r)
-	})
-	http.HandleFunc("/posts", func(w http.ResponseWriter, r *http.Request) {
-		handlers.PostsHandler(database, w, r)
-	})
-	http.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
-		handlers.UsersHandler(database, w, r)
-	})
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		handlers.LoginHandler(database, w, r)
-	})
-	http.HandleFunc("/add-comment", func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddCommentHandler(database, w, r)
-	})
-	http.HandleFunc("/like", func(w http.ResponseWriter, r *http.Request) {
-		handlers.LikeHandler(database, w, r)
-	})
-	http.HandleFunc("/create-category", func(w http.ResponseWriter, r *http.Request) {
-		handlers.CreateCategoryHandler(database, w, r)
-	})
-	http.HandleFunc("/user/", func(w http.ResponseWriter, r *http.Request) {
-		handlers.UserViewHandler(database, w, r)
-	})
-	http.HandleFunc("/profileEdit/", func(w http.ResponseWriter, r *http.Request) {
-		handlers.ProfileEditHandler(database, w, r)
-	})
-	http.HandleFunc("/updateProfile", func(w http.ResponseWriter, r *http.Request) {
-		handlers.UpdateProfileHandler(database, w, r)
-	})
-	http.HandleFunc("/postView", func(w http.ResponseWriter, r *http.Request) {
-		handlers.PostViewHandler(database, w, r)
-	})
-	http.HandleFunc("/editPost", func(w http.ResponseWriter, r *http.Request) {
-		handlers.EditPostHandler(database, w, r)
-	})
-	http.HandleFunc("/updatePost", func(w http.ResponseWriter, r *http.Request) {
-		handlers.UpdatePostHandler(database, w, r)
-	})
-	http.HandleFunc("/like-comment", func(w http.ResponseWriter, r *http.Request) {
-		handlers.LikeCommentHandler(database, w, r)
-	})
-	http.HandleFunc("/updateComment", func(w http.ResponseWriter, r *http.Request) {
-		handlers.EditCommentHandler(database, w, r)
-	})
-	http.HandleFunc("/logout", handlers.LogoutHandler)
-	http.ListenAndServe("0.0.0.0:8100", nil)
+	r := mux.NewRouter()
+	r.Use(loggingMiddleware)
+	// Static file server
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("web/static"))))
+
+	// Route definitions
+	r.HandleFunc("/", server.MainPage(database)).Methods("GET")
+	r.HandleFunc("/profile", handlers.UserProfileHandler(database)).Methods("GET")
+	r.HandleFunc("/create-post", handlers.PostCreateFormHandler(database)).Methods("GET", "POST")
+	r.HandleFunc("/register", handlers.RegisterHandler(database)).Methods("GET", "POST")
+	r.HandleFunc("/posts", handlers.PostsHandler(database)).Methods("GET")
+	r.HandleFunc("/users", handlers.UsersHandler(database)).Methods("GET")
+	r.HandleFunc("/login", handlers.LoginHandler(database)).Methods("GET", "POST")
+	r.HandleFunc("/add-comment", handlers.AddCommentHandler(database)).Methods("POST")
+	r.HandleFunc("/like", handlers.LikeHandler(database)).Methods("POST")
+	r.HandleFunc("/create-category", handlers.CreateCategoryHandler(database)).Methods("GET", "POST")
+	r.HandleFunc("/user/{id}", handlers.UserViewHandler(database)).Methods("GET")
+	r.HandleFunc("/profileEdit", handlers.ProfileEditHandler(database)).Methods("GET", "POST")
+	r.HandleFunc("/updateProfile", handlers.UpdateProfileHandler(database)).Methods("POST")
+	r.HandleFunc("/postView", handlers.PostViewHandler(database)).Methods("GET")
+	r.HandleFunc("/editPost", handlers.EditPostHandler(database)).Methods("GET", "POST")
+	r.HandleFunc("/updatePost", handlers.UpdatePostHandler(database)).Methods("POST")
+	r.HandleFunc("/like-comment", handlers.LikeCommentHandler(database)).Methods("POST")
+	r.HandleFunc("/updateComment", handlers.EditCommentHandler(database)).Methods("POST")
+	r.HandleFunc("/sortedPosts", handlers.CategoryPostsHandler(database)).Methods("GET")
+	r.HandleFunc("/search", handlers.SearchHandler(database)).Methods("GET", "POST")
+	r.HandleFunc("/notifications", handlers.NotificationHandler(database)).Methods("GET")
+
+	r.HandleFunc("/logout", handlers.LogoutHandler).Methods("POST")
+
+	// Start server
+	http.ListenAndServe("0.0.0.0:8100", r)
 }

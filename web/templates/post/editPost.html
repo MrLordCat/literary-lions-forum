@@ -1,0 +1,26 @@
+{{define "content"}}
+    <h1>Edit Post</h1>
+    {{if .Post.IsDeleted}}
+        <p>This post has been deleted.</p>
+    {{else if .CanEdit}}
+        <!-- Форма для обновления поста -->
+        <form action="/updatePost" method="post">
+            <input type="hidden" name="postID" value="{{.Post.ID}}">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" value="{{.Post.Title}}" required><br>
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" required>{{.Post.Content}}</textarea><br>
+            <button type="submit">Update Post</button>
+        </form>
+
+        <!-- Форма для удаления поста -->
+        <form method="POST" action="/updatePost">
+            <input type="hidden" name="postID" value="{{.Post.ID}}">
+            <input type="hidden" name="action" value="delete">  <!-- Указывает на удаление -->
+            <button type="submit">Delete Post</button>
+        </form>
+    {{else}}
+        <p>You can only edit your posts within one hour of creation.</p>
+    {{end}}
+    <a href="/postView?postID={{.Post.ID}}"><button>Cancel</button></a>
+{{end}}
