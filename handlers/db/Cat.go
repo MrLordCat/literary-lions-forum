@@ -8,6 +8,10 @@ func CreateCategory(dbConn *sql.DB, name string) error {
 	_, err := dbConn.Exec("INSERT INTO categories (name) VALUES (?)", name)
 	return err
 }
+func DeleteCategory(dbConn *sql.DB, name string) error {
+	_, err := dbConn.Exec("DELETE FROM categories WHERE name = ?", name)
+	return err
+}
 func GetAllCategories(db *sql.DB) ([]Category, error) {
 	categories := []Category{}
 	rows, err := db.Query("SELECT id, name FROM categories")

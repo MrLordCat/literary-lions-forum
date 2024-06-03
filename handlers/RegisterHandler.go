@@ -18,7 +18,10 @@ func RegisterHandler(dbConn *sql.DB) http.HandlerFunc {
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 
-		if err := db.CreateUser(dbConn, username, email, password); err != nil {
+		// Устанавливаем isAdmin в true, если username равен 'admin'
+		isAdmin := username == "admin"
+
+		if err := db.CreateUser(dbConn, username, email, password, isAdmin); err != nil {
 			http.Error(w, "Failed to create user: "+err.Error(), http.StatusInternalServerError)
 			return
 		}

@@ -17,7 +17,7 @@ func CreatePost(db *sql.DB, title, content string, authorID, categoryID int) err
 	return err
 }
 
-func GetAllPosts(db *sql.DB, postID int64, userID int64) ([]Post, error) {
+func GetAllPosts(db *sql.DB, postID int, userID int64) ([]Post, error) {
 	var query strings.Builder
 	query.WriteString(`
 	SELECT p.id, p.title, p.content, u.username, u.id as author_id, p.created_at, p.is_deleted,
@@ -105,14 +105,14 @@ func GetPostsByCategory(db *sql.DB, categoryID int64) ([]Post, error) {
 		if authorID.Valid {
 			p.AuthorID = int(authorID.Int64)
 		}
-		p.Comments, _ = GetCommentsForPost(db, p.ID) 
+		p.Comments, _ = GetCommentsForPost(db, p.ID)
 		posts = append(posts, p)
 	}
 
 	return posts, nil
 }
 
-func UpdateOrDeletePost(db *sql.DB, postID int64, title, content string, delete bool) error {
+func UpdateOrDeletePost(db *sql.DB, postID int, title, content string, delete bool) error {
 	if delete {
 		// Устанавливаем пост как удаленный и очищаем содержимое
 		query := `UPDATE posts SET title = '', content = '', is_deleted = 1 WHERE id = ?`

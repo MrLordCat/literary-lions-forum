@@ -5,6 +5,27 @@ import (
 	"fmt"
 )
 
+func GetCommentByID(db *sql.DB, commentID int) (*Comment, error) {
+	query := `
+    SELECT c.id, c.content, c.author_id, cu.username, c.created_at, COALESCE(SUM(cl.like_type), 0) AS likes
+    FROM comments c
+    JOIN users cu ON c.author_id = cu.id
+    LEFT JOIN comment_likes cl ON c.id = cl.comment_id
+    WHERE c.id = ?
+    GROUP BY c.id, c.content, c.author_id, cu.username, c.created_at
+    `
+	row := db.QueryRow(query, commentID)
+
+	var c Comment
+	err := row.Scan(&c.ID, &c.Content, &c.AuthorID, &c.AuthorName, &c.CreatedAt, &c.Likes)
+	if err == sql.ErrNoRows {
+		return nil, nil // No comment found
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &c, nil
+}
 func GetCommentsForPost(db *sql.DB, postID int) ([]Comment, error) {
 	query := `
     SELECT c.id, c.content, cu.username, c.created_at, COALESCE(SUM(cl.like_type), 0) AS likes
@@ -32,7 +53,7 @@ func GetCommentsForPost(db *sql.DB, postID int) ([]Comment, error) {
 	return comments, nil
 }
 
-func DeleteOrUpdateComment(db *sql.DB, commentID int64, newContent string, delete bool) error {
+func DeleteOrUpdateComment(db *sql.DB, commentID int, newContent string, delete bool) error {
 	if delete {
 		// Если delete == true, удаляем комментарий
 		query := `DELETE FROM comments WHERE id = ?`

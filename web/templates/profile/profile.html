@@ -1,13 +1,21 @@
 {{define "content"}}
     <h1>{{.User.Username}}'s Profile</h1>
     <p>Email: {{.User.Email}}</p>
-    <p>Karma: {{.Karma}}</p>
+    <p>Karma: {{.User.Karma}}</p>
+    {{if .User.FirstName.Valid}}
+        <p>First Name: {{.User.FirstName.String}}</p>
+    {{end}}
+    {{if .User.LastName.Valid}}
+        <p>Last Name: {{.User.LastName.String}}</p>
+    {{end}}
 
     <h2>Your Posts</h2>
     {{if .UserPosts}}
         <ul>
             {{range .UserPosts}}
-                <li><a href="/postView?postID={{.ID}}">{{.Title}}</a></li>
+                {{if not .IsDeleted}}
+                    <li><a href="/postView?postID={{.ID}}">{{.Title}}</a></li>
+                {{end}}
             {{end}}
         </ul>
     {{else}}
@@ -18,12 +26,16 @@
     {{if .LikedPosts}}
         <ul>
             {{range .LikedPosts}}
-                <li><a href="/postView?postID={{.ID}}">{{.Title}}</a></li>
+                {{if not .IsDeleted}}
+                    <li><a href="/postView?postID={{.ID}}">{{.Title}}</a></li>
+                {{end}}
             {{end}}
         </ul>
     {{else}}
         <p>You have not liked any posts yet.</p>
     {{end}}
 
-    <a href="/profileEdit"><button>Edit Profile</button></a>
+    {{if .IsOwnProfile}}
+        <a href="/profileEdit"><button>Edit Profile</button></a>
+    {{end}}
 {{end}}

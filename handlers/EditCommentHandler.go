@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
 	"literary-lions-forum/handlers/db"
 	"net/http"
 	"strconv"
@@ -15,15 +14,42 @@ func EditCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		commentID, err := strconv.ParseInt(r.FormValue("comment_id"), 10, 64)
+		commentID, err := strconv.Atoi(r.FormValue("comment_id"))
 		if err != nil {
 			http.Error(w, "Invalid comment ID", http.StatusBadRequest)
 			return
 		}
 
+		userID, err := GetUserIDFromSession(r)
+		if err != nil || userID == 0 {
+			http.Error(w, "You must be logged in", http.StatusForbidden)
+			return
+		}
+
+		user, err := db.GetUserByID(dbConn, userID)
+		if err != nil {
+			http.Error(w, "Failed to get user", http.StatusInternalServerError)
+			return
+		}
+
+		comment, err := db.GetCommentByID(dbConn, commentID) // Используем функцию для получения конкретного комментария
+		if err != nil {
+			http.Error(w, "Failed to get comment", http.StatusInternalServerError)
+			return
+		}
+
+		if comment == nil {
+			http.Error(w, "Comment not found", http.StatusNotFound)
+			return
+		}
+
+		if user.ID != comment.AuthorID && !user.IsAdmin {
+			http.Error(w, "You do not have permission to edit this comment", http.StatusForbidden)
+			return
+		}
+
 		// Проверка, какое действие нужно выполнить
 		action := r.FormValue("action") // Действие может быть 'delete' или 'update'
-		fmt.Println(action)
 		switch action {
 		case "delete":
 			if err := db.DeleteOrUpdateComment(dbConn, commentID, "", true); err != nil {

@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func CreateUser(db *sql.DB, username, email, password string) error {
+func CreateUser(db *sql.DB, username, email, password string, isAdmin bool) error {
 	// Проверка формата email
 	_, err := mail.ParseAddress(email)
 	if err != nil {
@@ -21,7 +21,7 @@ func CreateUser(db *sql.DB, username, email, password string) error {
 		return err
 	}
 
-	_, err = db.Exec("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)", username, email, string(hashedPassword))
+	_, err = db.Exec("INSERT INTO users (username, email, password_hash, is_admin) VALUES (?, ?, ?, ?)", username, email, string(hashedPassword), isAdmin)
 	return err
 }
 
@@ -37,7 +37,7 @@ func GetUserByUsernameOrEmail(db *sql.DB, login string) (User, error) {
 }
 
 func GetAllUsers(db *sql.DB) ([]User, error) {
-	rows, err := db.Query("SELECT id, username, created_at FROM users ORDER BY created_at DESC")
+	rows, err := db.Query("SELECT id, username, karma, created_at FROM users ORDER BY created_at DESC")
 	if err != nil {
 		log.Println("Failed to execute query: ", err)
 		return nil, err
@@ -47,7 +47,7 @@ func GetAllUsers(db *sql.DB) ([]User, error) {
 	var users []User
 	for rows.Next() {
 		var u User
-		if err := rows.Scan(&u.ID, &u.Username, &u.CreatedAt); err != nil {
+		if err := rows.Scan(&u.ID, &u.Username, &u.Karma, &u.CreatedAt); err != nil {
 			log.Println("Failed to scan row: ", err)
 			continue
 		}

@@ -12,6 +12,9 @@
             {{if .LoggedIn}}
                 <a href="/profile">My Profile</a>
                 <div class="notifications">
+                    <a href="/notifications" class="notification-button">
+                        Notifications <span class="notification-count">{{.UnreadNotifications}}</span>
+                    </a>
                 </div>
                 <form action="/logout" method="post" style="display: inline;">
                     <button type="submit">Logout</button>

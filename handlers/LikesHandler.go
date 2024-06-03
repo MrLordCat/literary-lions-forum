@@ -10,7 +10,7 @@ import (
 func LikeHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
@@ -38,13 +38,39 @@ func LikeHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		http.Redirect(w, r, "/posts", http.StatusFound)
+		// Получаем автора поста для обновления его кармы
+		posts, err := db.GetAllPosts(dbConn, postID, 0)
+		if err != nil {
+			http.Error(w, "Failed to fetch post", http.StatusInternalServerError)
+			return
+		}
+		if len(posts) == 0 {
+			http.Error(w, "Post not found", http.StatusNotFound)
+			return
+		}
+		post := posts[0]
+
+		// Обновляем карму автора поста
+		err = db.UpdateUserKarma(dbConn, post.AuthorID)
+		if err != nil {
+			http.Error(w, "Failed to update user karma", http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
 	}
 }
+
 func LikeCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		userID, err := GetUserIDFromSession(r)
+		if err != nil || userID == 0 {
+			http.Error(w, "You must be logged in to like or dislike comments", http.StatusForbidden)
 			return
 		}
 
@@ -59,22 +85,31 @@ func LikeCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		authorID, err := strconv.Atoi(r.FormValue("author_id")) // Используйте author_id здесь
-		if err != nil {
-			http.Error(w, "Invalid author ID", http.StatusBadRequest)
-			return
-		}
-
-		likeType, err := strconv.Atoi(r.FormValue("like_type"))
-		if err != nil {
+		likeType, err := strconv.Atoi(r.FormValue("like_type")) // 1 for like, -1 for dislike
+		if err != nil || (likeType != 1 && likeType != -1) {
 			http.Error(w, "Invalid like type", http.StatusBadRequest)
 			return
 		}
 
-		if err := db.LikeComment(dbConn, commentID, authorID, likeType); err != nil {
+		if err := db.LikeComment(dbConn, commentID, userID, likeType); err != nil {
 			http.Error(w, "Failed to like comment: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/", http.StatusFound)
+
+		// Получаем автора комментария для обновления его кармы
+		comment, err := db.GetCommentByID(dbConn, commentID)
+		if err != nil {
+			http.Error(w, "Failed to fetch comment", http.StatusInternalServerError)
+			return
+		}
+
+		// Обновляем карму автора комментария
+		err = db.UpdateUserKarma(dbConn, comment.AuthorID)
+		if err != nil {
+			http.Error(w, "Failed to update user karma", http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 	}
 }

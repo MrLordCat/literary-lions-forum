@@ -1,20 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <a href="/"><button> Home</button></a>
-    <title>Users</title>
-</head>
-<body>
-    <h1>Users</h1>
-    <ul>
-        {{range .}}
-        <li>
-            <a href="/user/{{.ID}}">Username: {{.Username}}, Created At: {{.CreatedAt}}</a>
-        </li>
-        {{else}}
-        <li>No users found.</li>
-        {{end}}
-    </ul>
-</body>
-</html>
+{{define "content"}}
+<h1>Users</h1>
+<ul>
+    {{range .Users}}
+    <li>
+        <a href="/user/{{.ID}}">Username: {{.Username}}, Karma: {{.Karma}}</a>
+    </li>
+    {{else}}
+    <li>No users found.</li>
+    {{end}}
+</ul>
+{{end}}

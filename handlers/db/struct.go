@@ -7,9 +7,11 @@ import (
 
 type User struct {
 	ID           int
+	Karma        int
 	Username     string
 	Email        string
 	PasswordHash string
+	IsAdmin      bool
 	CreatedAt    time.Time
 	FirstName    sql.NullString
 	LastName     sql.NullString
@@ -31,6 +33,7 @@ type Post struct {
 type Comment struct {
 	ID         int
 	AuthorName string
+	AuthorID   int
 	Content    string
 	CreatedAt  time.Time
 	Likes      int // Добавляем поле для хранения количества лайков

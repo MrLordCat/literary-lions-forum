@@ -28,7 +28,10 @@
                 shareLinkDiv.style.display = 'block';
             });
         </script>
-        <a href="/editPost?postID={{.Post.ID}}"><button>Edit Post</button></a>
+        <!-- Временные выводы для отладки -->
+        {{if or (eq .UserID .Post.AuthorID) .IsAdmin}}
+            <a href="/editPost?postID={{.Post.ID}}"><button>Edit Post</button></a>
+        {{end}}
     {{end}}
     <a href="/posts"><button>Back to Posts</button></a>
 

@@ -3,31 +3,39 @@ package handlers
 import (
 	"database/sql"
 	"literary-lions-forum/handlers/db"
+	"literary-lions-forum/utils"
+	"log"
 	"net/http"
-	"text/template"
 )
 
 func NotificationHandler(database *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Получите ID пользователя из сессии или другого источника
 		userID, err := GetUserIDFromSession(r)
 		if err != nil {
-			http.Error(w, "", http.StatusUnauthorized)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		notifications, err := db.GetUnreadNotifications(database, userID)
+		options := map[string]bool{
+			"notifications": true,
+		}
+
+		data, err := utils.GetPageData(database, userID, options)
 		if err != nil {
-			http.Error(w, "Error fetching notifications", http.StatusInternalServerError)
+			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		tmpl, err := template.ParseFiles("web/template/notifications.html")
-		if err != nil {
-			http.Error(w, "Error loading template", http.StatusInternalServerError)
+		// Пометка уведомлений как прочитанных
+		if err := db.MarkNotificationsAsRead(database, userID); err != nil {
+			http.Error(w, "Failed to mark notifications as read: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		tmpl.Execute(w, notifications)
+		data.Title = "Notifications"
+
+		log.Printf("Notifications: %+v", data.Notifications) // Логируем полученные уведомления
+
+		utils.RenderTemplate(w, "notifications.html", data)
 	}
 }

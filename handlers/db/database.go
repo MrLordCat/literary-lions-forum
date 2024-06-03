@@ -28,6 +28,7 @@ func CreateTables(db *sql.DB) {
         author_id INTEGER,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         category_id INTEGER,
+		is_deleted BOOLEAN DEFAULT FALSE,
         FOREIGN KEY (author_id) REFERENCES users(id),
         FOREIGN KEY (category_id) REFERENCES categories(id)
     );
@@ -38,7 +39,9 @@ func CreateTables(db *sql.DB) {
 		password_hash TEXT NOT NULL,
 		first_name TEXT DEFAULT '',
 		last_name TEXT DEFAULT '',
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		karma INTEGER DEFAULT 0,
+		is_admin BOOLEAN DEFAULT FALSE
 	);
 	CREATE TABLE IF NOT EXISTS comments (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,

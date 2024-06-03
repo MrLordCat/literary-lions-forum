@@ -47,7 +47,7 @@ func AddCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 		}
 
 		// Получаем ID автора поста
-		authorPosts, err := db.GetAllPosts(dbConn, int64(postID), 0)
+		authorPosts, err := db.GetAllPosts(dbConn, postID, 0)
 		if err != nil {
 			http.Error(w, "Failed to get post author", http.StatusInternalServerError)
 			return

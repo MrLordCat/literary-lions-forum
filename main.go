@@ -30,7 +30,7 @@ func main() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("web/static"))))
 
 	// Route definitions
-	r.HandleFunc("/", server.MainPage(database)).Methods("GET")
+	r.HandleFunc("/", server.MainPageHandler(database)).Methods("GET")
 	r.HandleFunc("/profile", handlers.UserProfileHandler(database)).Methods("GET")
 	r.HandleFunc("/create-post", handlers.PostCreateFormHandler(database)).Methods("GET", "POST")
 	r.HandleFunc("/register", handlers.RegisterHandler(database)).Methods("GET", "POST")
@@ -51,7 +51,10 @@ func main() {
 	r.HandleFunc("/sortedPosts", handlers.CategoryPostsHandler(database)).Methods("GET")
 	r.HandleFunc("/search", handlers.SearchHandler(database)).Methods("GET", "POST")
 	r.HandleFunc("/notifications", handlers.NotificationHandler(database)).Methods("GET")
+	r.HandleFunc("/delete-post", handlers.EditPostHandler(database)).Methods("POST")
+	r.HandleFunc("/delete-category", handlers.CreateCategoryHandler(database)).Methods("POST")
 
+	r.HandleFunc("/delete-comment", handlers.EditCommentHandler(database)).Methods("POST")
 	r.HandleFunc("/logout", handlers.LogoutHandler).Methods("POST")
 
 	// Start server

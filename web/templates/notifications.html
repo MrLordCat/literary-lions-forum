@@ -1,20 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Notifications</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
+{{define "content"}}
     <h1>Notifications</h1>
-    {{ if . }}
+    {{if .Notifications}}
         <ul>
-            {{ range . }}
-                <li>{{ .Content }} - {{ .CreatedAt }}</li>
-            {{ end }}
+            {{range .Notifications}}
+                <li>{{.Content}} - {{.CreatedAt}}</li>
+            {{end}}
         </ul>
-    {{ else }}
+    {{else}}
         <p>No new notifications.</p>
-    {{ end }}
-</body>
-</html>
+    {{end}}
+{{end}}

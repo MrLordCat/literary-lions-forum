@@ -31,10 +31,20 @@ func PostViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			http.Error(w, "Post ID is required", http.StatusBadRequest)
 			return
 		}
-
-		postID, err := strconv.ParseInt(postIDStr, 10, 64)
+		postID, err := strconv.Atoi(postIDStr)
 		if err != nil {
 			http.Error(w, "Invalid post ID", http.StatusBadRequest)
+			return
+		}
+		userID, err := GetUserIDFromSession(r)
+		if err != nil {
+			http.Error(w, "You need to be logged in to view this page", http.StatusUnauthorized)
+			return
+		}
+
+		user, err := db.GetUserByID(dbConn, userID)
+		if err != nil {
+			http.Error(w, "Failed to fetch user", http.StatusInternalServerError)
 			return
 		}
 
@@ -59,8 +69,9 @@ func PostViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			"Post":     post,
 			"Comments": comments,
 			"LoggedIn": true,
+			"UserID":   userID,
+			"IsAdmin":  user.IsAdmin,
 		}
-
 		utils.RenderTemplate(w, "post/postView.html", data)
 	}
 }

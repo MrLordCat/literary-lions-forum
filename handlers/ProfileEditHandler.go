@@ -17,20 +17,18 @@ func ProfileEditHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		user, err := db.GetUserByID(dbConn, userID)
+		options := map[string]bool{
+			"notifications": true,
+		}
+
+		data, err := utils.GetPageData(dbConn, userID, options)
 		if err != nil {
-			http.Error(w, "Failed to fetch user data", http.StatusInternalServerError)
+			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		data := struct {
-			Title    string
-			LoggedIn bool
-			User     db.User
-		}{
-			Title:    "Edit Profile",
-			LoggedIn: true,
-			User:     user,
-		}
+
+		data.Title = "Edit Profile"
+
 		utils.RenderTemplate(w, "profile/profileEdit.html", data)
 	}
 }

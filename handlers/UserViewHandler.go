@@ -29,7 +29,18 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		loggedInUserID, err := GetUserIDFromSession(r)
 		if err != nil {
-			http.Error(w, "You need to be logged in to view profiles", http.StatusUnauthorized)
+			http.Error(w, "You need to be logged in to view this page", http.StatusUnauthorized)
+			return
+		}
+
+		options := map[string]bool{
+			"userPosts":  true,
+			"likedPosts": true,
+		}
+
+		data, err := utils.GetPageData(dbConn, loggedInUserID, options)
+		if err != nil {
+			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -39,28 +50,11 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		userPosts, err := db.GetUserPosts(dbConn, userID)
-		if err != nil {
-			http.Error(w, "Failed to fetch user posts", http.StatusInternalServerError)
-			return
-		}
-
-		likedPosts, err := db.GetLikedPosts(dbConn, userID)
-		if err != nil {
-			http.Error(w, "Failed to fetch liked posts", http.StatusInternalServerError)
-			return
-		}
-
 		isOwnProfile := loggedInUserID == userID
 
-		data := map[string]interface{}{
-			"User":         user,
-			"UserPosts":    userPosts,
-			"LikedPosts":   likedPosts,
-			"IsOwnProfile": isOwnProfile,
-			"LoggedIn":     true,
-		}
-
+		data.Title = user.Username + "'s Profile"
+		data.User = user
+		data.IsOwnProfile = isOwnProfile
 		utils.RenderTemplate(w, "profile/viewProfile.html", data)
 	}
 }
