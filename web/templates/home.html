@@ -1,67 +1,46 @@
 {{define "content"}}
-    <h1>Welcome to the Book Forum</h1>
+    <div class="welcome-section">
+        <h1>Welcome to the Book Forum</h1>
+    </div>
 
     {{if .LoggedIn}}
-        <div>
-            {{if .IsAdmin}}
-            <h1>Create Category</h1>
-            <form method="POST" action="/create-category">
-                <label for="categoryName">Category Name:</label>
-                <input type="hidden" name="action" value="create">
-                <input type="text" id="categoryName" name="categoryName" required>
-                <button type="submit">Create Category</button>
-            </form>
-        
-          
-                <h2>Delete Category</h2>
-                <ul>
-                    {{range .Categories}}
-                        <li>
-                            {{.Name}}
-                            <form method="POST" action="/delete-category" style="display:inline;">
-                                <input type="hidden" name="action" value="delete">
-                                <input type="hidden" name="categoryName" value="{{.Name}}">
-                                <button type="submit">Delete</button>
-                            </form>
-                        </li>
-                    {{end}}
-                </ul>
-            {{end}}
+        <div class="action-buttons">
+            <button class="toggle-form" data-target="create-post-form">Create New Post</button>
+            <button class="toggle-form" data-target="view-posts-form">View Posts by Category</button>
         </div>
 
-        <h2>Create New Post</h2>
-        <form method="POST" action="/create-post">
-            <label for="title">Title:</label>
-            <input type="text" id="title" name="title" required><br>
-            <label for="content">Content:</label>
-            <textarea id="content" name="content" required></textarea><br>
-            <label for="category">Category:</label>
-            <select id="category" name="category_id">
-                {{range .Categories}}
-                    <option value="{{.ID}}">{{.Name}}</option>
-                {{end}}
-            </select><br>
-            <button type="submit">Create Post</button>
-        </form>
+        <div id="create-post-form" class="form-container hidden">
+            <h2>Create New Post</h2>
+            <form method="POST" action="/create-post">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required><br>
+                <label for="content">Content:</label>
+                <textarea id="content" name="content" required></textarea><br>
+                <label for="category">Category:</label>
+                <select id="category" name="category_id">
+                    {{range .Categories}}
+                        <option value="{{.ID}}">{{.Name}}</option>
+                    {{end}}
+                </select><br>
+                <button type="submit">Create Post</button>
+            </form>
+        </div>
 
-        <h2>View Posts by Category</h2>
-        <form action="/sortedPosts" method="get">
-            <label for="category">Choose a Category:</label>
-            <select id="category" name="category_id">
-                {{range .Categories}}
-                    <option value="{{.ID}}">{{.Name}}</option>
-                {{end}}
-            </select><br>
-            <button type="submit">View Posts</button>
-        </form>
-
-        <form method="GET" action="/search">
-            <input type="text" name="query" placeholder="Search posts and users..." required>
-            <button type="submit">Search</button>
-        </form>
+        <div id="view-posts-form" class="form-container hidden">
+            <h2>View Posts by Category</h2>
+            <form action="/sortedPosts" method="get">
+                <label for="category">Choose a Category:</label>
+                <select id="category" name="category_id">
+                    {{range .Categories}}
+                        <option value="{{.ID}}">{{.Name}}</option>
+                    {{end}}
+                </select><br>
+                <button type="submit">View Posts</button>
+            </form>
+        </div>
     {{else}}
-        <div>
-            <h1>Login</h1>
+        <div class="auth-section">
+            <h2>Login</h2>
             <form method="POST" action="/login">
                 <label for="login">Username or Email:</label>
                 <input type="text" id="login" name="login" required><br>
@@ -70,7 +49,7 @@
                 <button type="submit">Login</button>
             </form>
 
-            <h1>Register</h1>
+            <h2>Register</h2>
             <form method="POST" action="/register">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required><br>
@@ -83,68 +62,77 @@
         </div>
     {{end}}
 
-    <h1>Posts</h1>
-    {{range .Posts}}
-        {{if not .IsDeleted}}
-            <div class="post">
-                <h2><a href="/postView?postID={{.ID}}">{{.Title}}</a></h2>
-                <p>{{.Content}}</p>
-                <div>
-                    Likes: {{.Likes}}, Dislikes: {{.Dislikes}}
-                    <form method="POST" action="/like" style="display:inline;">
-                        <input type="hidden" name="post_id" value="{{.ID}}">
-                        <input type="hidden" name="like_type" value="1">
-                        <button type="submit">👍 Like</button>
-                    </form>
-                    <form method="POST" action="/like" style="display:inline;">
-                        <input type="hidden" name="post_id" value="{{.ID}}">
-                        <input type="hidden" name="like_type" value="-1">
-                        <button type="submit">👎 Dislike</button>
-                    </form>
-                    {{if $.IsAdmin}}
-                        <form method="POST" action="/updatePost" style="display:inline;">
-                            <input type="hidden" name="postID" value="{{.ID}}">
-                            <input type="hidden" name="action" value="delete">
-                            <button type="submit">🗑️ Delete Post</button>
-                        </form>
-                        <a href="/editPost?postID={{.ID}}">Edit Post</a>
-                    {{end}}
-                </div>
-                <small>Posted by {{.AuthorName}} at {{.CreatedAt}}</small>
-                <h3>Comments:</h3>
-                {{if .Comments}}
-                    <ul>
-                        {{range .Comments}}
-                            <li>
-                                {{.Content}}<br>
-                                <small>Posted at {{.CreatedAt}}</small>
-                                <div>
-                                    Likes: {{.Likes}}
-                                    <form method="POST" action="/like-comment" style="display:inline;">
-                                        <input type="hidden" name="comment_id" value="{{.ID}}">
-                                        <input type="hidden" name="like_type" value="1">
-                                        <button type="submit">👍 Like</button>
-                                    </form>
-                                    {{if $.IsAdmin}}
-                                        <form method="POST" action="/delete-comment" style="display:inline;">
-                                            <input type="hidden" name="comment_id" value="{{.ID}}">
-                                            <input type="hidden" name="action" value="delete">
-                                            <button type="submit">🗑️ Delete Comment</button>
-                                        </form>
-                                    {{end}}
-                                </div>
-                            </li>
-                        {{end}}
-                    </ul>
-                {{else}}
-                    <p>No comments yet.</p>
+    <div class="posts-section">
+        <h2>Posts</h2>
+        <div class="posts-list">
+            {{range .Posts}}
+                {{if not .IsDeleted}}
+                    <div class="post">
+                        <h3><a href="/postView?postID={{.ID}}">{{.Title}}</a></h3>
+                        <div class="post-content">{{renderPostContent .Content}}</div>
+                        <div class="post-actions">
+                            <span>Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</span>
+                            <form method="POST" action="/like" style="display:inline;">
+                                <input type="hidden" name="post_id" value="{{.ID}}">
+                                <input type="hidden" name="like_type" value="1">
+                                <button type="submit">👍 Like</button>
+                            </form>
+                            <form method="POST" action="/like" style="display:inline;">
+                                <input type="hidden" name="post_id" value="{{.ID}}">
+                                <input type="hidden" name="like_type" value="-1">
+                                <button type="submit">👎 Dislike</button>
+                            </form>
+                            {{if $.IsAdmin}}
+                                <form method="POST" action="/updatePost" style="display:inline;">
+                                    <input type="hidden" name="postID" value="{{.ID}}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button type="submit">🗑️ Delete Post</button>
+                                </form>
+                                <a href="/editPost?postID={{.ID}}">Edit Post</a>
+                            {{end}}
+                        </div>
+                        <small>Posted by {{.AuthorName}} at {{.CreatedAt}}</small>
+                        <div class="comments-section">
+                            <button class="toggle-comments" data-target="comments-{{.ID}}">Comment</button>
+                            <div id="comments-{{.ID}}" class="comments-container hidden">
+                                <h4>Comments:</h4>
+                                {{if .Comments}}
+                                    <ul>
+                                        {{range .Comments}}
+                                            <li>
+                                                <p>{{.Content}}</p>
+                                                <small>Posted at {{.CreatedAt}}</small>
+                                                <div>
+                                                    Likes: {{.Likes}}
+                                                    <form method="POST" action="/like-comment" style="display:inline;">
+                                                        <input type="hidden" name="comment_id" value="{{.ID}}">
+                                                        <input type="hidden" name="like_type" value="1">
+                                                        <button type="submit">👍 Like</button>
+                                                    </form>
+                                                    {{if $.IsAdmin}}
+                                                        <form method="POST" action="/delete-comment" style="display:inline;">
+                                                            <input type="hidden" name="comment_id" value="{{.ID}}">
+                                                            <input type="hidden" name="action" value="delete">
+                                                            <button type="submit">🗑️ Delete Comment</button>
+                                                        </form>
+                                                    {{end}}
+                                                </div>
+                                            </li>
+                                        {{end}}
+                                    </ul>
+                                {{else}}
+                                    <p>No comments yet.</p>
+                                {{end}}
+                                <form method="POST" action="/add-comment">
+                                    <input type="hidden" name="post_id" value="{{.ID}}">
+                                    <textarea name="content" required placeholder="Add a comment..."></textarea>
+                                    <button type="submit">Comment</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 {{end}}
-                <form method="POST" action="/add-comment">
-                    <input type="hidden" name="post_id" value="{{.ID}}">
-                    <textarea name="content" required placeholder="Add a comment..."></textarea>
-                    <button type="submit">Comment</button>
-                </form>
-            </div>
-        {{end}}
-    {{end}}
+            {{end}}
+        </div>
+    </div>
 {{end}}

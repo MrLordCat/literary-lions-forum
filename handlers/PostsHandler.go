@@ -16,7 +16,16 @@ func PostsHandler(dbConn *sql.DB) http.HandlerFunc {
 			http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
 			return
 		}
-		tmpl := template.Must(template.ParseFiles("web/template/posts.html"))
+
+		// Обработка контента каждого поста
+		for i, post := range posts {
+			posts[i].Content = string(utils.RenderPostContent(post.Content))
+		}
+
+		tmpl := template.Must(template.New("posts.html").Funcs(template.FuncMap{
+			"renderPostContent": utils.RenderPostContent,
+		}).ParseFiles("web/templates/post/posts.html"))
+
 		err = tmpl.Execute(w, map[string]interface{}{"Posts": posts})
 		if err != nil {
 			http.Error(w, "Failed to render template", http.StatusInternalServerError)
@@ -24,9 +33,10 @@ func PostsHandler(dbConn *sql.DB) http.HandlerFunc {
 		}
 	}
 }
+
 func PostViewHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		postIDStr := r.URL.Query().Get("postID") // Получение ID поста из URL параметра
+		postIDStr := r.URL.Query().Get("postID")
 		if postIDStr == "" {
 			http.Error(w, "Post ID is required", http.StatusBadRequest)
 			return
@@ -72,6 +82,7 @@ func PostViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			"UserID":   userID,
 			"IsAdmin":  user.IsAdmin,
 		}
+
 		utils.RenderTemplate(w, "post/postView.html", data)
 	}
 }

@@ -36,7 +36,7 @@ func CategoryPostsHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 		fmt.Println(categoryName)
-		tmpl := template.Must(template.ParseFiles("web/template/sortedPosts.html"))
+		tmpl := template.Must(template.ParseFiles("web/templates/post/sortedPosts.html"))
 		err = tmpl.Execute(w, map[string]interface{}{
 			"Posts":        posts,
 			"CategoryID":   categoryID,

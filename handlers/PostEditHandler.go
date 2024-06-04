@@ -14,10 +14,10 @@ func EditPostHandler(dbConn *sql.DB) http.HandlerFunc {
 		postIDStr := r.FormValue("postID")
 		postID, err := strconv.Atoi(postIDStr)
 		if err != nil {
-			fmt.Print(postID)
 			http.Error(w, "Invalid post ID", http.StatusBadRequest)
 			return
 		}
+
 		posts, err := db.GetAllPosts(dbConn, postID, 0)
 		if err != nil {
 			http.Error(w, "Failed to fetch post", http.StatusInternalServerError)
@@ -109,6 +109,7 @@ func UpdatePostHandler(dbConn *sql.DB) http.HandlerFunc {
 			http.Error(w, "Failed to update post", http.StatusInternalServerError)
 			return
 		}
+		fmt.Println(content)
 		http.Redirect(w, r, "/postView?postID="+strconv.Itoa(int(postID)), http.StatusFound)
 	}
 }

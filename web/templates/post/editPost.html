@@ -19,6 +19,12 @@
             <input type="hidden" name="action" value="delete">  <!-- Указывает на удаление -->
             <button type="submit">Delete Post</button>
         </form>
+
+        <!-- Предварительный просмотр отформатированного контента -->
+        <div class="post-preview">
+            <h2>Preview:</h2>
+            <div class="post-content">{{renderPostContent .Post.Content}}</div>
+        </div>
     {{else}}
         <p>You can only edit your posts within one hour of creation.</p>
     {{end}}

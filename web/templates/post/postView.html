@@ -3,7 +3,7 @@
     {{if .Post.IsDeleted}}
         <p>This post has been deleted.</p>
     {{else}}
-        <p>{{.Post.Content}}</p>
+        <div class="post-content">{{.Post.Content}}</div>
         <p>Posted by: {{.Post.AuthorName}} at {{.Post.CreatedAt}}</p>
         <div>
             Likes: {{.Post.Likes}}, Dislikes: {{.Post.Dislikes}}
@@ -28,7 +28,6 @@
                 shareLinkDiv.style.display = 'block';
             });
         </script>
-        <!-- Временные выводы для отладки -->
         {{if or (eq .UserID .Post.AuthorID) .IsAdmin}}
             <a href="/editPost?postID={{.Post.ID}}"><button>Edit Post</button></a>
         {{end}}

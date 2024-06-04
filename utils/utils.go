@@ -7,13 +7,21 @@ import (
 	"literary-lions-forum/handlers/db"
 	"net/http"
 	"path/filepath"
+	"strings"
+
+	"github.com/russross/blackfriday/v2"
 )
 
 func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
-	templates := template.Must(template.ParseFiles(
-		filepath.Join("web/templates", "base.html"),
-		filepath.Join("web/templates", tmpl),
+	funcMap := template.FuncMap{
+		"renderPostContent": RenderPostContent,
+	}
+
+	templates := template.Must(template.New("base.html").Funcs(funcMap).ParseFiles(
+		filepath.Join("web/templates/", "base.html"),
+		filepath.Join("web/templates/", tmpl),
 	))
+
 	err := templates.ExecuteTemplate(w, "base.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -98,4 +106,18 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 	}
 
 	return data, nil
+}
+func RenderPostContent(content string) template.HTML {
+	extensions := blackfriday.NoIntraEmphasis |
+		blackfriday.Tables |
+		blackfriday.FencedCode |
+		blackfriday.Autolink |
+		blackfriday.Strikethrough |
+		blackfriday.SpaceHeadings |
+		blackfriday.BackslashLineBreak |
+		blackfriday.DefinitionLists |
+		blackfriday.AutoHeadingIDs
+	content = strings.ReplaceAll(content, "\n", "<br>")
+	output := blackfriday.Run([]byte(content), blackfriday.WithExtensions(extensions))
+	return template.HTML(output)
 }
