@@ -3,14 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>{{.Title}}</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    {{block "styles" .}}{{end}}
 </head>
 <body>
     <header>
         <nav class="navbar">
             <a href="/" class="navbar-item">Home</a>
+            <a href="/users" class="navbar-item">Users List</a>
+            <form class="search-form" method="GET" action="/search">
+                <input type="text" name="query" placeholder="Search posts and users..." required>
+                <button type="submit">
+                    <span class="material-icons">search</span>
+                </button>
+            </form>
             {{if .LoggedIn}}
+                <a href="/create-post" class="navbar-item">Create Post</a>
                 <a href="/profile" class="navbar-item">My Profile</a>
                 <div class="notifications navbar-item">
                     <a href="/notifications" class="notification-button">
@@ -22,16 +31,33 @@
                     <button type="submit" class="navbar-item">Logout</button>
                 </form>
             {{else}}
-                <a href="/login" class="navbar-item">Login</a>
-                <a href="/register" class="navbar-item">Register</a>
+                <div class="dropdown">
+                    <button class="navbar-item dropdown-toggle" onclick="toggleDropdown('register-dropdown')">Register</button>
+                    <div id="register-dropdown" class="dropdown-content hidden">
+                        <form method="POST" action="/register">
+                            <label for="username">Username:</label>
+                            <input type="text" id="username" name="username" required><br>
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" required><br>
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" name="password" required><br>
+                            <button type="submit">Register</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="navbar-item dropdown-toggle" onclick="toggleDropdown('login-dropdown')">Login</button>
+                    <div id="login-dropdown" class="dropdown-content hidden">
+                        <form method="POST" action="/login">
+                            <label for="login">Username or Email:</label>
+                            <input type="text" id="login" name="login" required><br>
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" name="password" required><br>
+                            <button type="submit">Login</button>
+                        </form>
+                    </div>
+                </div>
             {{end}}
-            <a href="/users" class="navbar-item">Users List</a>
-            <form class="search-form" method="GET" action="/search">
-                <input type="text" name="query" placeholder="Search posts and users..." required>
-                <button type="submit">
-                    <span class="material-icons">search</span>
-                </button>
-            </form>
         </nav>
     </header>
     <main>

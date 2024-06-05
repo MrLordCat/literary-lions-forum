@@ -7,6 +7,7 @@ import (
 	"literary-lions-forum/handlers/db"
 	"net/http"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/russross/blackfriday/v2"
@@ -19,6 +20,9 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 
 	templates := template.Must(template.New("base.html").Funcs(funcMap).ParseFiles(
 		filepath.Join("web/templates/", "base.html"),
+		filepath.Join("web/templates/home/", "categoriesBlock.html"),
+		filepath.Join("web/templates/home/", "postsBlock.html"),
+		filepath.Join("web/templates/home/", "top-usersBlock.html"),
 		filepath.Join("web/templates/", tmpl),
 	))
 
@@ -33,7 +37,7 @@ type PageData struct {
 	User                db.User
 	LoggedIn            bool
 	IsAdmin             bool
-	Karma               int
+	Karma               sql.NullInt64
 	UserPosts           []db.Post
 	LikedPosts          []db.Post
 	Notifications       []db.Notification
@@ -41,6 +45,7 @@ type PageData struct {
 	Posts               []db.Post
 	Categories          []db.Category
 	Users               []db.User
+	TopUsers            []db.User
 	IsOwnProfile        bool
 }
 
@@ -101,12 +106,40 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 			return data, err
 		}
 	}
+
+	if options["topUsers"] {
+		users, err := db.GetAllUsers(dbConn)
+		if err != nil {
+			return data, err
+		}
+		// Сортируем пользователей по карме
+		sort.Slice(users, func(i, j int) bool {
+			karmaI := int64(0)
+			if users[i].Karma.Valid {
+				karmaI = users[i].Karma.Int64
+			}
+			karmaJ := int64(0)
+			if users[j].Karma.Valid {
+				karmaJ = users[j].Karma.Int64
+			}
+			return karmaI > karmaJ
+		})
+
+		// Получаем топ 10 пользователей
+		if len(users) > 10 {
+			data.TopUsers = users[:10]
+		} else {
+			data.TopUsers = users
+		}
+	}
+
 	if options["isOwnProfile"] {
 		data.IsOwnProfile = options["isOwnProfile"]
 	}
 
 	return data, nil
 }
+
 func RenderPostContent(content string) template.HTML {
 	extensions := blackfriday.NoIntraEmphasis |
 		blackfriday.Tables |

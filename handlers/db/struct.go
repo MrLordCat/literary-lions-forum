@@ -7,7 +7,7 @@ import (
 
 type User struct {
 	ID           int
-	Karma        int
+	Karma        sql.NullInt64
 	Username     string
 	Email        string
 	PasswordHash string

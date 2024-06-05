@@ -17,6 +17,7 @@ func MainPageHandler(dbConn *sql.DB) http.HandlerFunc {
 			"posts":         true,
 			"notifications": loggedIn,
 			"categories":    true,
+			"topUsers":      true,
 		}
 
 		data, err := utils.GetPageData(dbConn, userID, options)
@@ -28,6 +29,6 @@ func MainPageHandler(dbConn *sql.DB) http.HandlerFunc {
 		data.Title = "Home"
 		data.LoggedIn = loggedIn
 
-		utils.RenderTemplate(w, "home.html", data)
+		utils.RenderTemplate(w, "home/home.html", data)
 	}
 }

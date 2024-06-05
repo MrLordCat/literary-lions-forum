@@ -1,0 +1,14 @@
+{{define "categories"}}
+<div class="categories-section">
+    <h2>View Posts by Category</h2>
+    <form action="/sortedPosts" method="get">
+        <label for="category">Choose a Category:</label>
+        <select id="category" name="category_id">
+            {{range .Categories}}
+                <option value="{{.ID}}">{{.Name}}</option>
+            {{end}}
+        </select><br>
+        <button type="submit">View Posts</button>
+    </form>
+</div>
+{{end}}

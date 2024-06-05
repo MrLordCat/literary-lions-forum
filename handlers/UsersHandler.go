@@ -16,8 +16,7 @@ func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		var users []db.User
-		users, err = db.GetAllUsers(dbConn)
+		users, err := db.GetAllUsers(dbConn)
 		if err != nil {
 			http.Error(w, "Failed to fetch users", http.StatusInternalServerError)
 			return
@@ -27,8 +26,22 @@ func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 		sortBy := r.URL.Query().Get("sort")
 		if sortBy == "" || sortBy == "karma" {
 			sort.Slice(users, func(i, j int) bool {
-				return users[i].Karma > users[j].Karma
+				karmaI := int64(0)
+				if users[i].Karma.Valid {
+					karmaI = users[i].Karma.Int64
+				}
+				karmaJ := int64(0)
+				if users[j].Karma.Valid {
+					karmaJ = users[j].Karma.Int64
+				}
+				return karmaI > karmaJ
 			})
+		}
+
+		// Получаем топ 10 пользователей по карме
+		topUsers := users
+		if len(users) > 10 {
+			topUsers = users[:10]
 		}
 
 		options := map[string]bool{
@@ -43,6 +56,7 @@ func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		data.Title = "Users"
 		data.Users = users
+		data.TopUsers = topUsers // Добавляем топ пользователей
 
 		utils.RenderTemplate(w, "users.html", data)
 	}

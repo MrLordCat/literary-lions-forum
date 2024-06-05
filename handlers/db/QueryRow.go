@@ -9,6 +9,9 @@ import (
 // query is the SQL query string, args are the arguments for any placeholders in the query,
 // and dest are the pointers to variables where the scanned results should be stored.
 func QueryRow(db *sql.DB, query string, args []interface{}, dest ...interface{}) error {
+	if args == nil {
+		args = []interface{}{}
+	}
 	row := db.QueryRow(query, args...)
 	err := row.Scan(dest...)
 	if err != nil {

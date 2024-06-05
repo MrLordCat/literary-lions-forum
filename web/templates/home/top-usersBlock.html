@@ -1,0 +1,15 @@
+{{define "top-users"}}
+<div class="top-users-section">
+    <h2>Top 10 Users</h2>
+    <ul>
+        {{range .TopUsers}}
+        <li>
+            <a href="/user/{{.ID}}">Username: {{.Username}}</a>
+            <span>Karma: {{.Karma.Int64}}</span>
+        </li>
+        {{else}}
+        <li>No users found.</li>
+        {{end}}
+    </ul>
+</div>
+{{end}}

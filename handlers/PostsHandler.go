@@ -75,12 +75,24 @@ func PostViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Получение данных об оповещениях
+		options := map[string]bool{
+			"notifications": true,
+		}
+		pageData, err := utils.GetPageData(dbConn, userID, options)
+		if err != nil {
+			http.Error(w, "Failed to fetch page data: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		data := map[string]interface{}{
-			"Post":     post,
-			"Comments": comments,
-			"LoggedIn": true,
-			"UserID":   userID,
-			"IsAdmin":  user.IsAdmin,
+			"Post":                post,
+			"Comments":            comments,
+			"LoggedIn":            true,
+			"UserID":              userID,
+			"IsAdmin":             user.IsAdmin,
+			"UnreadNotifications": pageData.UnreadNotifications,
+			"Notifications":       pageData.Notifications,
 		}
 
 		utils.RenderTemplate(w, "post/postView.html", data)
