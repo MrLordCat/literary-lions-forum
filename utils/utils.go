@@ -20,9 +20,11 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 
 	templates := template.Must(template.New("base.html").Funcs(funcMap).ParseFiles(
 		filepath.Join("web/templates/", "base.html"),
+		filepath.Join("web/templates/home/", "catAdmin.html"),
 		filepath.Join("web/templates/home/", "categoriesBlock.html"),
 		filepath.Join("web/templates/home/", "postsBlock.html"),
 		filepath.Join("web/templates/home/", "top-usersBlock.html"),
+		filepath.Join("web/templates/", "notifications.html"),
 		filepath.Join("web/templates/", tmpl),
 	))
 
@@ -47,6 +49,8 @@ type PageData struct {
 	Users               []db.User
 	TopUsers            []db.User
 	IsOwnProfile        bool
+	IsProfile           bool
+	SinglePost          db.Post
 }
 
 func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData, error) {
@@ -71,7 +75,7 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 		}
 
 		if options["userPosts"] {
-			data.UserPosts, err = db.GetUserPosts(dbConn, userID)
+			data.UserPosts, err = db.GetAllPosts(dbConn, 0, int64(userID))
 			if err != nil {
 				return data, err
 			}
@@ -135,6 +139,20 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 
 	if options["isOwnProfile"] {
 		data.IsOwnProfile = options["isOwnProfile"]
+	}
+	var postID int
+	if options["singlePost"] {
+		posts, err := db.GetAllPosts(dbConn, postID, 0)
+		if err != nil {
+			return data, err
+		}
+		if len(posts) > 0 {
+			data.SinglePost = posts[0]
+		}
+	}
+	// Установка значения IsProfile
+	if options["isProfile"] {
+		data.IsProfile = true
 	}
 
 	return data, nil

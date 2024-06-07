@@ -77,11 +77,11 @@ func CreateTables(db *sql.DB) {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		user_id INTEGER NOT NULL,
 		content TEXT NOT NULL,
+		post_id INTEGER,
 		is_read INTEGER DEFAULT 0, -- 0 для непрочитанного, 1 для прочитанного
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (user_id) REFERENCES users(id)
 	);
-	
 	`
 
 	_, err := db.Exec(query)

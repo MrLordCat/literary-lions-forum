@@ -1,41 +1,49 @@
 {{define "content"}}
-    <h1>{{.User.Username}}'s Profile</h1>
-    <p>Email: {{.User.Email}}</p>
-    <p>Karma: {{.User.Karma}}</p>
-    {{if .User.FirstName.Valid}}
-        <p>First Name: {{.User.FirstName.String}}</p>
-    {{end}}
-    {{if .User.LastName.Valid}}
-        <p>Last Name: {{.User.LastName.String}}</p>
-    {{end}}
-
-    <h2>Your Posts</h2>
-    {{if .UserPosts}}
-        <ul>
-            {{range .UserPosts}}
-                {{if not .IsDeleted}}
-                    <li><a href="/postView?postID={{.ID}}">{{.Title}}</a></li>
-                {{end}}
+    <link rel="stylesheet" href="/static/css/profile.css">
+    <link rel="stylesheet" href="/static/css/posts.css">
+    <div class="profile-container">
+        <div class="profile-column profile-liked-posts">
+            <h2>Liked Posts</h2>
+            {{if .LikedPosts}}
+                <ul>
+                    {{range .LikedPosts}}
+                        {{if not .IsDeleted}}
+                            <li>
+                                <a href="/postView?postID={{.ID}}">{{.Title}}</a>
+                            </li>
+                        {{end}}
+                    {{end}}
+                </ul>
+            {{else}}
+                <p>You have not liked any posts yet.</p>
             {{end}}
-        </ul>
-    {{else}}
-        <p>You have not posted anything yet.</p>
-    {{end}}
+        </div>
 
-    <h2>Liked Posts</h2>
-    {{if .LikedPosts}}
-        <ul>
-            {{range .LikedPosts}}
-                {{if not .IsDeleted}}
-                    <li><a href="/postView?postID={{.ID}}">{{.Title}}</a></li>
-                {{end}}
+        <div class="profile-column profile-posts">
+            {{template "posts" .}}
+        </div>
+
+        <div class="profile-column profile-info">
+            <h1>{{if .IsOwnProfile}}
+                Hello, {{.User.Username}}
+            {{else}}
+                {{.User.Username}}'s Profile
+            {{end}}</h1>
+            <p>Email: {{.User.Email}}</p>
+            {{if .User.Karma.Valid}}
+                <p>Karma: {{.User.Karma.Int64}}</p>
+            {{else}}
+                <p>Karma: N/A</p>
             {{end}}
-        </ul>
-    {{else}}
-        <p>You have not liked any posts yet.</p>
-    {{end}}
-
-    {{if .IsOwnProfile}}
-        <a href="/profileEdit"><button>Edit Profile</button></a>
-    {{end}}
+            {{if .User.FirstName.Valid}}
+                <p>First Name: {{.User.FirstName.String}}</p>
+            {{end}}
+            {{if .User.LastName.Valid}}
+                <p>Last Name: {{.User.LastName.String}}</p>
+            {{end}}
+            {{if .IsOwnProfile}}
+                <a href="/profileEdit"><button>Edit Profile</button></a>
+            {{end}}
+        </div>
+    </div>
 {{end}}

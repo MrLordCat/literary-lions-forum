@@ -39,3 +39,19 @@ func NotificationHandler(database *sql.DB) http.HandlerFunc {
 		utils.RenderTemplate(w, "notifications.html", data)
 	}
 }
+func MarkNotificationsAsReadHandler(dbConn *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, err := GetUserIDFromSession(r)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		if err := db.MarkNotificationsAsRead(dbConn, userID); err != nil {
+			http.Error(w, "Failed to mark notifications as read: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}
+}

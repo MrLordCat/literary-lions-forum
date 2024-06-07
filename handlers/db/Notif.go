@@ -5,9 +5,9 @@ import (
 	"log"
 )
 
-func AddNotification(db *sql.DB, userID int, content string) error {
-	query := `INSERT INTO notifications (user_id, content) VALUES (?, ?)`
-	_, err := db.Exec(query, userID, content)
+func AddNotification(db *sql.DB, userID int, postID int, content string) error {
+	query := `INSERT INTO notifications (user_id, post_id, content) VALUES (?, ?, ?)`
+	_, err := db.Exec(query, userID, postID, content)
 	if err != nil {
 		log.Printf("Error adding notification: %v", err)
 		return err
@@ -16,10 +16,14 @@ func AddNotification(db *sql.DB, userID int, content string) error {
 }
 
 func GetUnreadNotifications(db *sql.DB, userID int) ([]Notification, error) {
-	query := `SELECT id, user_id, content, is_read, created_at FROM notifications WHERE user_id = ? AND is_read = 0`
+	query := `
+        SELECT id, user_id, content, is_read, created_at, post_id 
+        FROM notifications 
+        WHERE user_id = ? AND is_read = 0
+    `
+
 	rows, err := db.Query(query, userID)
 	if err != nil {
-		log.Printf("Error getting unread notifications: %v", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -27,14 +31,16 @@ func GetUnreadNotifications(db *sql.DB, userID int) ([]Notification, error) {
 	var notifications []Notification
 	for rows.Next() {
 		var notification Notification
-		if err := rows.Scan(&notification.ID, &notification.UserID, &notification.Content, &notification.IsRead, &notification.CreatedAt); err != nil {
-			log.Printf("Error scanning notification: %v", err)
-			continue
+		err := rows.Scan(&notification.ID, &notification.UserID, &notification.Content, &notification.IsRead, &notification.CreatedAt, &notification.PostID)
+		if err != nil {
+			return nil, err
 		}
 		notifications = append(notifications, notification)
 	}
+
 	return notifications, nil
 }
+
 func GetUnreadNotificationsCount(db *sql.DB, userID int) (int, error) {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND read = false", userID).Scan(&count)

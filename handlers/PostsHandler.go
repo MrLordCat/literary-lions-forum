@@ -41,58 +41,33 @@ func PostViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			http.Error(w, "Post ID is required", http.StatusBadRequest)
 			return
 		}
+
 		postID, err := strconv.Atoi(postIDStr)
 		if err != nil {
-			http.Error(w, "Invalid post ID", http.StatusBadRequest)
-			return
-		}
-		userID, err := GetUserIDFromSession(r)
-		if err != nil {
-			http.Error(w, "You need to be logged in to view this page", http.StatusUnauthorized)
+			http.Error(w, "Invalid Post ID", http.StatusBadRequest)
 			return
 		}
 
-		user, err := db.GetUserByID(dbConn, userID)
+		userID, _ := GetUserIDFromSession(r)
+
+		options := map[string]bool{
+			"singlePost": true,
+		}
+
+		data, err := utils.GetPageData(dbConn, userID, options)
 		if err != nil {
-			http.Error(w, "Failed to fetch user", http.StatusInternalServerError)
+			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
+		// Устанавливаем единственный пост в данные
 		posts, err := db.GetAllPosts(dbConn, postID, 0)
 		if err != nil {
-			http.Error(w, "Failed to fetch post", http.StatusInternalServerError)
+			http.Error(w, "Failed to fetch post: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		if len(posts) == 0 {
-			http.Error(w, "Post not found", http.StatusNotFound)
-			return
-		}
-		post := posts[0]
-
-		comments, err := db.GetCommentsForPost(dbConn, int(postID))
-		if err != nil {
-			http.Error(w, "Failed to fetch comments", http.StatusInternalServerError)
-			return
-		}
-
-		// Получение данных об оповещениях
-		options := map[string]bool{
-			"notifications": true,
-		}
-		pageData, err := utils.GetPageData(dbConn, userID, options)
-		if err != nil {
-			http.Error(w, "Failed to fetch page data: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		data := map[string]interface{}{
-			"Post":                post,
-			"Comments":            comments,
-			"LoggedIn":            true,
-			"UserID":              userID,
-			"IsAdmin":             user.IsAdmin,
-			"UnreadNotifications": pageData.UnreadNotifications,
-			"Notifications":       pageData.Notifications,
+		if len(posts) > 0 {
+			data.Posts = posts
 		}
 
 		utils.RenderTemplate(w, "post/postView.html", data)

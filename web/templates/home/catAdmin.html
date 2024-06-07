@@ -1,0 +1,21 @@
+{{define "catAdmin"}}
+    <div class="admin-categories-section">
+        <h2>Manage Categories</h2>
+        <form action="/create-category" method="post">
+            <input type="hidden" name="action" value="create">
+            <label for="categoryName">Category Name:</label>
+            <input type="text" id="categoryName" name="categoryName" required>
+            <button id="postbutton" type="submit">Create</button>
+        </form>
+        <form action="/create-category" method="post">
+            <input type="hidden" name="action" value="delete">
+            <label for="category">Category Name to Delete:</label>
+            <select id="deleteCategoryName" name="categoryNameToDelete" required>
+                {{range .Categories}}
+                    <option value="{{.Name}}">{{.Name}}</option>
+                {{end}}
+            </select><br>
+            <button id="postbutton" type="submit">Delete</button>
+        </form>
+    </div>
+{{end}}

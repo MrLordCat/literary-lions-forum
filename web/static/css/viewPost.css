@@ -1,0 +1,32 @@
+#share-button {
+    background-color: #ff4500;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 1rem;
+}
+
+#share-button:hover {
+    background-color: #ff8b60;
+}
+
+.share-link {
+    margin-top: 10px;
+    display: none;
+}
+
+.btn {
+    background-color: #ff4500;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.btn:hover {
+    background-color: #ff8b60;
+}

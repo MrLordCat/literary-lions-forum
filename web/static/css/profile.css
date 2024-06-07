@@ -1,0 +1,88 @@
+
+.profile-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 2rem;
+    padding: 2rem;
+    align-items: flex-start;
+}
+
+.profile-column {
+    flex: 1;
+    max-width: 900px;
+}
+
+.profile-info, .profile-posts, .profile-liked-posts {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.profile-info h1, .profile-posts h2, .profile-liked-posts h2 {
+    text-align: center;
+}
+
+button {
+    background-color: #ff4500;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ff8b60;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    background-color: #f6f7f8;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+ul li a:hover {
+    text-decoration: underline;
+}
+ul li a {
+    color: #ff4500;
+    text-decoration: none;
+}
+
+.liked-posts-section {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.liked-posts-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.liked-posts-section li {
+    margin: 0.5rem 0;
+    background-color: #f6f7f8;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.liked-posts-section li a {
+    text-decoration: none;
+    color: #ff4500;
+}
+
+.liked-posts-section li a:hover {
+    text-decoration: underline;
+    color: #ff8b60;
+}

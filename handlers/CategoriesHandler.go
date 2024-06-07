@@ -24,6 +24,7 @@ func CreateCategoryHandler(dbConn *sql.DB) http.HandlerFunc {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
+
 		if r.FormValue("action") == "create" {
 			categoryName := r.FormValue("categoryName")
 			if categoryName == "" {
@@ -39,9 +40,9 @@ func CreateCategoryHandler(dbConn *sql.DB) http.HandlerFunc {
 
 			http.Redirect(w, r, "/", http.StatusFound)
 		} else if r.FormValue("action") == "delete" {
-			categoryName := r.FormValue("categoryName")
-			if err != nil {
-				http.Error(w, "Invalid category ID", http.StatusBadRequest)
+			categoryName := r.FormValue("categoryNameToDelete")
+			if categoryName == "" {
+				http.Error(w, "Category name must not be empty", http.StatusBadRequest)
 				return
 			}
 
@@ -51,7 +52,7 @@ func CreateCategoryHandler(dbConn *sql.DB) http.HandlerFunc {
 				return
 			}
 
-			w.WriteHeader(http.StatusOK)
+			http.Redirect(w, r, "/", http.StatusFound)
 		} else {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}

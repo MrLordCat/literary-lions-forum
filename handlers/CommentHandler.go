@@ -62,7 +62,7 @@ func AddCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		// Создаем уведомление для автора поста
 		contentNotification := "Your post has been commented on."
-		err = db.AddNotification(dbConn, authorID, contentNotification)
+		err = db.AddNotification(dbConn, authorID, postID, contentNotification)
 		if err != nil {
 			http.Error(w, "Failed to add notification", http.StatusInternalServerError)
 			return

@@ -3,10 +3,15 @@
     <link rel="stylesheet" href="/static/css/posts.css">
     <link rel="stylesheet" href="/static/css/top-users.css">
     <div class="welcome-section">
-        <h1>Welcome to the Book Forum</h1>
+        <h1 id="welcome">Welcome to the Book Forum</h1>
     </div>
     <div class="main-content">
-        {{template "categories" .}}
+        <div class="left-column">
+            {{template "categories" .}}
+            {{if .IsAdmin}}
+                {{template "catAdmin" .}}
+            {{end}}
+        </div>
         {{template "posts" .}}
         {{template "top-users" .}}
     </div>

@@ -1,12 +1,11 @@
-{{define "content"}}
-    <h1>Notifications</h1>
+{{define "notifications"}}
     {{if .Notifications}}
         <ul>
             {{range .Notifications}}
-                <li>{{.Content}} - {{.CreatedAt}}</li>
+                <li><a href="/postView?postID={{.PostID}}">{{.Content}} - {{.CreatedAt}}</a></li>
             {{end}}
         </ul>
     {{else}}
-        <p>No new notifications.</p>
+        <p id="notif">No new notifications.</p>
     {{end}}
 {{end}}

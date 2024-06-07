@@ -38,10 +38,17 @@ func EditPostHandler(dbConn *sql.DB) http.HandlerFunc {
 				canEdit = true
 			}
 		}
-
+		notifications, err := db.GetUnreadNotifications(dbConn, loggedInUserID)
+		if err != nil {
+			http.Error(w, "Failed to fetch notifications", http.StatusInternalServerError)
+			return
+		}
 		data := map[string]interface{}{
-			"Post":    post,
-			"CanEdit": canEdit,
+			"Post":                post,
+			"CanEdit":             canEdit,
+			"LoggedIn":            true,
+			"Notifications":       notifications,
+			"UnreadNotifications": len(notifications),
 		}
 
 		utils.RenderTemplate(w, "post/editPost.html", data)

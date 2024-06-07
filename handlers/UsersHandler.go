@@ -46,6 +46,7 @@ func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		options := map[string]bool{
 			"notifications": true,
+			"isProfile":     true,
 		}
 
 		data, err := utils.GetPageData(dbConn, userID, options)

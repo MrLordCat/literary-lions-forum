@@ -53,4 +53,5 @@ type Notification struct {
 	Content   string
 	IsRead    int
 	CreatedAt string
+	PostID    int
 }

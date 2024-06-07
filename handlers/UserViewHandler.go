@@ -38,7 +38,8 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			"likedPosts": true,
 		}
 
-		data, err := utils.GetPageData(dbConn, loggedInUserID, options)
+		// Получаем данные для профиля другого пользователя
+		data, err := utils.GetPageData(dbConn, userID, options)
 		if err != nil {
 			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -55,6 +56,8 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 		data.Title = user.Username + "'s Profile"
 		data.User = user
 		data.IsOwnProfile = isOwnProfile
-		utils.RenderTemplate(w, "profile/viewProfile.html", data)
+		data.Posts = data.UserPosts // Добавляем посты пользователя
+
+		utils.RenderTemplate(w, "profile/profile.html", data)
 	}
 }

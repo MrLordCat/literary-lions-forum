@@ -19,6 +19,7 @@ func UserProfileHandler(dbConn *sql.DB) http.HandlerFunc {
 			"userPosts":     true,
 			"likedPosts":    true,
 			"notifications": true,
+			"isProfile":     true,
 		}
 
 		data, err := utils.GetPageData(dbConn, userID, options)
@@ -28,6 +29,9 @@ func UserProfileHandler(dbConn *sql.DB) http.HandlerFunc {
 		}
 
 		data.IsOwnProfile = true
+		data.IsProfile = true // Установка флага IsProfile
+		data.Posts = data.UserPosts
+
 		utils.RenderTemplate(w, "profile/profile.html", data)
 	}
 }

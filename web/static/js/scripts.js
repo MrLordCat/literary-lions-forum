@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
 function toggleDropdown(dropdownId) {
     const dropdown = document.getElementById(dropdownId);
     if (dropdown.classList.contains('hidden')) {
@@ -36,4 +37,32 @@ function toggleDropdown(dropdownId) {
     } else {
         dropdown.classList.add('hidden');
     }
+}
+
+function toggleNotifications() {
+    const notificationsContent = document.getElementById('notifications-content');
+    if (notificationsContent.style.display === 'block') {
+        notificationsContent.style.display = 'none';
+    } else {
+        notificationsContent.style.display = 'block';
+        markNotificationsAsRead();
+    }
+}
+
+function markNotificationsAsRead() {
+    fetch('/mark-notifications-read', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => {
+        if (response.ok) {
+            const notificationCount = document.querySelector('.notification-count');
+            if (notificationCount) {
+                notificationCount.textContent = '0';
+            }
+        }
+    }).catch(error => {
+        console.error('Error marking notifications as read:', error);
+    });
 }

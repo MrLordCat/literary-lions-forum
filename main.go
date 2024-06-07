@@ -53,7 +53,7 @@ func main() {
 	r.HandleFunc("/notifications", handlers.NotificationHandler(database)).Methods("GET")
 	r.HandleFunc("/delete-post", handlers.EditPostHandler(database)).Methods("POST")
 	r.HandleFunc("/delete-category", handlers.CreateCategoryHandler(database)).Methods("POST")
-
+	r.HandleFunc("/mark-notifications-read", handlers.MarkNotificationsAsReadHandler(database)).Methods("POST")
 	r.HandleFunc("/delete-comment", handlers.EditCommentHandler(database)).Methods("POST")
 	r.HandleFunc("/logout", handlers.LogoutHandler).Methods("POST")
 

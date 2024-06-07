@@ -1,4 +1,6 @@
 {{define "content"}}
+<link rel="stylesheet" href="/static/css/createPost.css">
+<div class="form-container">
     <h1>Create New Post</h1>
     <form method="POST" action="/create-post">
         <label for="title">Title:</label>
@@ -11,6 +13,19 @@
                 <option value="{{.ID}}">{{.Name}}</option>
             {{end}}
         </select><br>
-        <button type="submit">Create Post</button>
+        <button type="submit" class="btn">Create Post</button>
+        <a href="/" class="btn">Cancel</a>
     </form>
+    <div class="post-preview">
+        <h2>Preview:</h2>
+        <div class="post-content" id="post-preview-content"></div>
+    </div>
+</div>
+<script>
+    document.getElementById('content').addEventListener('input', function () {
+        var content = this.value;
+        var preview = document.getElementById('post-preview-content');
+        preview.innerHTML = content.replace(/\n/g, '<br>');
+    });
+</script>
 {{end}}

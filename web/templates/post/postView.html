@@ -1,47 +1,6 @@
 {{define "content"}}
-    <h1>{{if .Post.IsDeleted}}Deleted Post{{else}}{{.Post.Title}}{{end}}</h1>
-    {{if .Post.IsDeleted}}
-        <p>This post has been deleted.</p>
-    {{else}}
-        <div class="post-content">{{.Post.Content}}</div>
-        <p>Posted by: {{.Post.AuthorName}} at {{.Post.CreatedAt}}</p>
-        <div>
-            Likes: {{.Post.Likes}}, Dislikes: {{.Post.Dislikes}}
-            <button id="share-button">Share this post</button>
-            <div id="share-link" style="margin-top: 10px; display: none;">
-                <p>Copy the link below to share this post:</p>
-                <textarea id="link-textarea" rows="3" cols="60" readonly></textarea>
-            </div>
-        </div>
-        <script>
-            document.getElementById('share-button').addEventListener('click', function() {
-                var title = "{{.Post.Title}}";
-                var content = "{{.Post.Content}}".substring(0, 100); 
-                var url = window.location.href;
-
-                var shareText = `Check out this post: ${title}\n\n${content}...\nRead more at: ${url}`;
-                
-                var textarea = document.getElementById('link-textarea');
-                textarea.value = shareText;
-
-                var shareLinkDiv = document.getElementById('share-link');
-                shareLinkDiv.style.display = 'block';
-            });
-        </script>
-        {{if or (eq .UserID .Post.AuthorID) .IsAdmin}}
-            <a href="/editPost?postID={{.Post.ID}}"><button>Edit Post</button></a>
-        {{end}}
-    {{end}}
-    <a href="/posts"><button>Back to Posts</button></a>
-
-    <h2>Comments</h2>
-    {{if .Comments}}
-        <ul>
-            {{range .Comments}}
-                <li>{{.AuthorName}}: {{.Content}} <small>at {{.CreatedAt}}</small></li>
-            {{end}}
-        </ul>
-    {{else}}
-        <p>No comments yet.</p>
-    {{end}}
+    <link rel="stylesheet" href="/static/css/posts.css">
+    <div class="single-post-section">
+        {{template "posts" .}}
+    </div>
 {{end}}

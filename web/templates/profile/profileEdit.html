@@ -1,27 +1,44 @@
 {{define "content"}}
-    <h1>Edit Profile</h1>
-    <form id="profileForm" action="/updateProfile" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" value="{{.User.Username}}" required><br>
-        
-        <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" name="firstName" value="{{if .User.FirstName.Valid}}{{.User.FirstName.String}}{{end}}"><br>
-        
-        <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" name="lastName" value="{{if .User.LastName.Valid}}{{.User.LastName.String}}{{end}}"><br>
-        
-        <label for="currentPassword">Current Password:</label>
-        <input type="password" id="currentPassword" name="currentPassword" ><br>
-        
-        <label for="newPassword">New Password:</label>
-        <input type="password" id="newPassword" name="newPassword"><br>
-        
-        <label for="confirmPassword">Confirm New Password:</label>
-        <input type="password" id="confirmPassword" name="confirmPassword"><br>
-        
-        <button type="submit">Update Profile</button>
-    </form>
-    <a href="/profile"><button>Cancel</button></a>
+    <link rel="stylesheet" href="/static/css/profileEdit.css">
+    <div class="edit-profile-container">
+        <h1>Edit Profile</h1>
+        <form id="profileForm" action="/updateProfile" method="post" class="edit-profile-form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="{{.User.Username}}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" value="{{if .User.FirstName.Valid}}{{.User.FirstName.String}}{{end}}">
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" value="{{if .User.LastName.Valid}}{{.User.LastName.String}}{{end}}">
+            </div>
+
+            <div class="form-group">
+                <label for="currentPassword">Current Password:</label>
+                <input type="password" id="currentPassword" name="currentPassword">
+            </div>
+
+            <div class="form-group">
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" name="newPassword">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword">
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" class="btn">Update Profile</button>
+                <a href="/profile" class="btn cancel-btn">Cancel</a>
+            </div>
+        </form>
+    </div>
 
     <script>
         document.getElementById('profileForm').addEventListener('submit', function(event) {
