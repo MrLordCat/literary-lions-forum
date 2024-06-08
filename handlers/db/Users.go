@@ -37,7 +37,7 @@ func GetUserByUsernameOrEmail(db *sql.DB, login string) (User, error) {
 }
 
 func GetAllUsers(db *sql.DB) ([]User, error) {
-	rows, err := db.Query("SELECT id, username, karma, created_at FROM users ORDER BY created_at DESC")
+	rows, err := db.Query("SELECT id, username, karma, created_at FROM users ORDER BY karma DESC")
 	if err != nil {
 		log.Println("Failed to execute query: ", err)
 		return nil, err
@@ -53,6 +53,7 @@ func GetAllUsers(db *sql.DB) ([]User, error) {
 		}
 		users = append(users, u)
 	}
+
 	return users, nil
 }
 func CheckCurrentPassword(db *sql.DB, userID int, currentPassword string) bool {

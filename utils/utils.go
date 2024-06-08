@@ -13,25 +13,31 @@ import (
 	"github.com/russross/blackfriday/v2"
 )
 
-func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) error {
 	funcMap := template.FuncMap{
 		"renderPostContent": RenderPostContent,
 	}
 
-	templates := template.Must(template.New("base.html").Funcs(funcMap).ParseFiles(
+	templates, err := template.New("base.html").Funcs(funcMap).ParseFiles(
 		filepath.Join("web/templates/", "base.html"),
 		filepath.Join("web/templates/home/", "catAdmin.html"),
 		filepath.Join("web/templates/home/", "categoriesBlock.html"),
 		filepath.Join("web/templates/home/", "postsBlock.html"),
 		filepath.Join("web/templates/home/", "top-usersBlock.html"),
 		filepath.Join("web/templates/", "notifications.html"),
+		filepath.Join("web/templates/", "usersList.html"),
 		filepath.Join("web/templates/", tmpl),
-	))
-
-	err := templates.ExecuteTemplate(w, "base.html", data)
+	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
+
+	err = templates.ExecuteTemplate(w, "base.html", data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type PageData struct {

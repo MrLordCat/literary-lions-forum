@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,13 +7,15 @@
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="/static/css/notif.css">
+    <link rel="stylesheet" href="/static/css/usersList.css">
     {{block "styles" .}}{{end}}
 </head>
 <body>
     <header>
         <nav class="navbar">
             <a href="/" class="navbar-item">Home</a>
-            <a href="#" class="navbar-item" id="users-list-toggle">Users List</a>
+            <a href="/users" class="navbar-item">Users</a>
+          
             <form class="search-form" method="GET" action="/search">
                 <input type="text" name="query" placeholder="Search posts and users..." required>
                 <button type="submit">
@@ -32,12 +35,12 @@
                     </div>
                 </div>
                 <form action="/logout" method="post" style="display: inline;">
-                    <button type="submit" id ="logout"class="navbar-item">Logout</button>
+                    <button type="submit" id="logout" class="navbar-item">Logout</button>
                 </form>
             {{else}}
                 <div class="dropdown">
-                    <button id ="logout" class="navbar-item dropdown-toggle" onclick="toggleDropdown('register-dropdown')">Register</button>
-                    <div  id="register-dropdown" class="dropdown-content hidden">
+                    <button id="logout" class="navbar-item dropdown-toggle" onclick="toggleDropdown('register-dropdown')">Register</button>
+                    <div id="register-dropdown" class="dropdown-content hidden">
                         <form method="POST" action="/register">
                             <label for="username">Username:</label>
                             <input type="text" id="username" name="username" required><br>
@@ -45,12 +48,12 @@
                             <input type="email" id="email" name="email" required><br>
                             <label for="password">Password:</label>
                             <input type="password" id="password" name="password" required><br>
-                            <button  type="submit">Register</button>
+                            <button type="submit">Register</button>
                         </form>
                     </div>
                 </div>
                 <div class="dropdown">
-                    <button id ="logout" class="navbar-item dropdown-toggle" onclick="toggleDropdown('login-dropdown')">Login</button>
+                    <button id="logout" class="navbar-item dropdown-toggle" onclick="toggleDropdown('login-dropdown')">Login</button>
                     <div id="login-dropdown" class="dropdown-content hidden">
                         <form method="POST" action="/login">
                             <label for="login">Username or Email:</label>
@@ -71,5 +74,6 @@
         <p>&copy; 2024 Book Forum</p>
     </footer>
     <script src="/static/js/scripts.js"></script>
+    <script src="/static/js/usersList.js"></script>
 </body>
 </html>

@@ -4,61 +4,31 @@ import (
 	"database/sql"
 	"literary-lions-forum/handlers/db"
 	"literary-lions-forum/utils"
+	"log"
 	"net/http"
-	"sort"
 )
 
 func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID, err := GetUserIDFromSession(r)
-		if err != nil {
-			http.Error(w, "You need to be logged in to view this page", http.StatusUnauthorized)
-			return
-		}
-
 		users, err := db.GetAllUsers(dbConn)
 		if err != nil {
+			log.Printf("Error fetching users: %v", err)
 			http.Error(w, "Failed to fetch users", http.StatusInternalServerError)
 			return
 		}
 
-		// По умолчанию сортируем по карме
-		sortBy := r.URL.Query().Get("sort")
-		if sortBy == "" || sortBy == "karma" {
-			sort.Slice(users, func(i, j int) bool {
-				karmaI := int64(0)
-				if users[i].Karma.Valid {
-					karmaI = users[i].Karma.Int64
-				}
-				karmaJ := int64(0)
-				if users[j].Karma.Valid {
-					karmaJ = users[j].Karma.Int64
-				}
-				return karmaI > karmaJ
-			})
+		data := struct {
+			Title string
+			Users []db.User
+		}{
+			Title: "Users",
+			Users: users,
 		}
 
-		// Получаем топ 10 пользователей по карме
-		topUsers := users
-		if len(users) > 10 {
-			topUsers = users[:10]
-		}
-
-		options := map[string]bool{
-			"notifications": true,
-			"isProfile":     true,
-		}
-
-		data, err := utils.GetPageData(dbConn, userID, options)
+		err = utils.RenderTemplate(w, "usersList.html", data)
 		if err != nil {
-			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
-			return
+			log.Printf("Error rendering template: %v", err)
+			http.Error(w, "Failed to render template", http.StatusInternalServerError)
 		}
-
-		data.Title = "Users"
-		data.Users = users
-		data.TopUsers = topUsers // Добавляем топ пользователей
-
-		utils.RenderTemplate(w, "users.html", data)
 	}
 }

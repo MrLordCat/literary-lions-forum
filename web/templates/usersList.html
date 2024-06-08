@@ -1,0 +1,12 @@
+{{define "content"}}
+<h1>{{.Title}}</h1>
+<ul>
+    {{range .Users}}
+    <li>
+        <a href="/user/{{.ID}}">Username: {{.Username}}, Karma: {{if .Karma.Valid}}{{.Karma.Int64}}{{else}}0{{end}}</a>
+    </li>
+    {{else}}
+    <li>No users found.</li>
+    {{end}}
+</ul>
+{{end}}

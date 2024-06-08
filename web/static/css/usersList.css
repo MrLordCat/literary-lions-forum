@@ -1,0 +1,40 @@
+/* usersList.css */
+.users-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.users-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    min-width: 300px;
+    max-width: 400px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.users-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.users-content ul li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.users-content ul li a {
+    text-decoration: none;
+    color: black;
+}
+
+.users-content ul li a:hover {
+    background-color: #ddd;
+}
