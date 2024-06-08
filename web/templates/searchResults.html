@@ -1,29 +1,33 @@
 {{define "content"}}
+    <link rel="stylesheet" href="/static/css/searchResults.css">
     <h1>Search Results</h1>
 
-    <h2>Posts</h2>
-    {{if .Results.Posts}}
-        {{range .Results.Posts}}
-            <div class="post">
-                <h3><a href="/postView?postID={{.ID}}">{{.Title}}</a></h3>
-                <p>{{.Content}}</p>
-            </div>
-        {{end}}
-    {{else}}
-        <p>No posts found.</p>
-    {{end}}
+    <div class="results-container">
+        <div class="posts-section">
+            <h2>Posts</h2>
+            {{if .Results.Posts}}
+                {{template "posts" .PostsData}}
+            {{else}}
+                <div class="post-card">
+                    <p>No posts found.</p>
+                </div>
+            {{end}}
+        </div>
 
-    <h2>Users</h2>
-    {{if .Results.Users}}
-        {{range .Results.Users}}
-            <div class="user">
-                <h3><a href="/user/{{.ID}}">{{.Username}}</a></h3>
-                <p>Email: {{.Email}}</p>
-            </div>
-        {{end}}
-    {{else}}
-        <p>No users found.</p>
-    {{end}}
-
-    <a href="/"><button>Back to Home</button></a>
+        <div class="users-list">
+            <h2>Users</h2>
+            {{if .Results.Users}}
+                {{range .Results.Users}}
+                    <div class="user-card">
+                        <h3><a href="/user/{{.ID}}">{{.Username}}</a></h3>
+                        <p>Email: {{.Email}}</p>
+                    </div>
+                {{end}}
+            {{else}}
+                <div class="user-card">
+                    <p>No users found.</p>
+                </div>
+            {{end}}
+        </div>
+    </div>
 {{end}}
