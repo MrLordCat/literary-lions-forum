@@ -1,0 +1,40 @@
+{{define "comments"}}
+<div class="comments-section">
+    <button id="postbutton" class="toggle-comments" data-target="comments-{{.Post.ID}}">Comment</button>
+    <div id="comments-{{.Post.ID}}" class="comments-container hidden">
+        <h4>Comments:</h4>
+        {{if .Post.Comments}}
+            <ul>
+                {{range .Post.Comments}}
+                    <li>
+                        <p>{{.Content}}</p>
+                        <small>Posted at {{.CreatedAt}}</small>
+                        <div>
+                            Likes: {{.Likes}}
+                            <form method="POST" action="/like-comment" style="display:inline;">
+                                <input type="hidden" name="comment_id" value="{{.ID}}">
+                                <input type="hidden" name="like_type" value="1">
+                                <button id="postbutton" type="submit">👍 Like</button>
+                            </form>
+                            {{if $.IsAdmin}}
+                                <form method="POST" action="/delete-comment" style="display:inline;">
+                                    <input type="hidden" name="comment_id" value="{{.ID}}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button id="postbutton" type="submit">🗑️ Delete Comment</button>
+                                </form>
+                            {{end}}
+                        </div>
+                    </li>
+                {{end}}
+            </ul>
+        {{else}}
+            <p>No comments yet.</p>
+        {{end}}
+        <form method="POST" action="/add-comment">
+            <input type="hidden" name="post_id" value="{{.Post.ID}}">
+            <textarea name="content" required placeholder="Add a comment..."></textarea>
+            <button id="postbutton" type="submit">Comment</button>
+        </form>
+    </div>
+</div>
+{{end}}

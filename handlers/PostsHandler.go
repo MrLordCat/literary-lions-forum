@@ -2,34 +2,41 @@ package handlers
 
 import (
 	"database/sql"
-	"html/template"
 	"literary-lions-forum/handlers/db"
 	"literary-lions-forum/utils"
+	"log"
 	"net/http"
 	"strconv"
 )
 
 func PostsHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		posts, err := db.GetAllPosts(dbConn, 0, 0)
+		// Получение ID пользователя из сессии (пример)
+		userID, err := GetUserIDFromSession(r)
 		if err != nil {
-			http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
+			http.Error(w, "You need to be logged in to view this page", http.StatusUnauthorized)
 			return
 		}
 
-		// Обработка контента каждого поста
-		for i, post := range posts {
-			posts[i].Content = string(utils.RenderPostContent(post.Content))
+		// Опции для получения данных страницы
+		options := map[string]bool{
+			"posts":         true,
+			"notifications": true,
+			"IsAdmin":       true,
 		}
 
-		tmpl := template.Must(template.New("posts.html").Funcs(template.FuncMap{
-			"renderPostContent": utils.RenderPostContent,
-		}).ParseFiles("web/templates/post/posts.html"))
-
-		err = tmpl.Execute(w, map[string]interface{}{"Posts": posts})
+		// Получение данных страницы
+		pageData, err := utils.GetPageData(dbConn, userID, options)
 		if err != nil {
+			http.Error(w, "Failed to fetch page data", http.StatusInternalServerError)
+			return
+		}
+
+		// Рендеринг шаблона с данными
+		err = utils.RenderTemplate(w, "posts.html", pageData)
+		if err != nil {
+			log.Printf("Error rendering template: %v", err)
 			http.Error(w, "Failed to render template", http.StatusInternalServerError)
-			return
 		}
 	}
 }

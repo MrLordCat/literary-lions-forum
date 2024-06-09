@@ -1,0 +1,9 @@
+{{define "post"}}
+<div class="post">
+    <h3><a href="/postView?postID={{.Post.ID}}">{{.Post.Title}}</a></h3>
+    <div class="post-content">{{renderPostContent .Post.Content}}</div>
+    {{template "postActions" .}}
+    <small class="post-meta">Posted by {{.Post.AuthorName}} at <span class="post-date">{{.Post.CreatedAt}}</span></small>
+    {{template "comments" .}}
+</div>
+{{end}}
