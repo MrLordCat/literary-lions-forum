@@ -1,25 +1,24 @@
 {{define "postActions"}}
-<div class="post-actions">
-    <span>Likes: {{.Post.Likes}}, Dislikes: {{.Post.Dislikes}}</span>
-    <form method="POST" action="/like" style="display:inline;">
-        <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <input type="hidden" name="like_type" value="1">
+<div class="post-actions" id="post-actions-{{.Post.ID}}">
+    <span id="post-likes-{{.Post.ID}}">Likes: {{.Post.Likes}}</span>, 
+    <span id="post-dislikes-{{.Post.ID}}">Dislikes: {{.Post.Dislikes}}</span>
+    <form onsubmit="handleLike(event, {{.Post.ID}}, 1)" style="display:inline;">
         <button id="postbutton" type="submit">👍 Like</button>
     </form>
-    <form method="POST" action="/like" style="display:inline;">
-        <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <input type="hidden" name="like_type" value="-1">
+    <form onsubmit="handleLike(event, {{.Post.ID}}, -1)" style="display:inline;">
         <button id="postbutton" type="submit">👎 Dislike</button>
     </form>
-    {{if .IsAdmin}}
-        <form method="POST" action="/updatePost" style="display:inline;">
-            <input type="hidden" name="postID" value="{{.Post.ID}}">
-            <input type="hidden" name="action" value="delete">
-            <button id="postbutton" type="submit">🗑️ Delete</button>
-        </form>
-        <button class="btn" id="postedit-{{.Post.ID}}" onclick="editPost('{{.Post.ID}}')">Edit Post</button>
-    {{else if .LoggedIn}}
-        <button id="postbutton" class="edit-post" data-author="{{.Post.AuthorID}}" data-created="{{.Post.CreatedAt}}" data-post-id="{{.Post.ID}}" style="display: none;">Edit Post</button>
+    {{if .LoggedIn}}
+        {{if or .IsAdmin (eq .User.ID .Post.AuthorID)}}
+            <form method="POST" action="/updatePost" style="display:inline;">
+                <input type="hidden" name="postID" value="{{.Post.ID}}">
+                <input type="hidden" name="action" value="delete">
+                <button id="postbutton" type="submit">🗑️ Delete</button>
+            </form>
+            <button class="btn" id="postedit-{{.Post.ID}}" onclick="editPost('{{.Post.ID}}')">Edit Post</button>
+        {{end}}
+    {{else}}
+        <div class="login-required-message" id="login-message-{{.Post.ID}}" style="display: none;">Please log in.</div>
     {{end}}
 </div>
 {{end}}

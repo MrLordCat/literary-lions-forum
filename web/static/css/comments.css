@@ -1,0 +1,37 @@
+.comments-section {
+    margin-top: 1rem;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    background-color: #f6f7f8;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+ul li div {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+ul li div button {
+    margin-left: 0.5rem;
+}
+
+.comments-container {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+}
+
+.button:hover {
+    background-color: #ff8b60; /* Цвет фона при наведении */
+}

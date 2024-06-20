@@ -18,7 +18,7 @@ func EditPostHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		posts, err := db.GetAllPosts(dbConn, postID, 0)
+		posts, err := db.GetAllPosts(dbConn, postID, 0, "likes")
 		if err != nil {
 			http.Error(w, "Failed to fetch post", http.StatusInternalServerError)
 			return
@@ -31,6 +31,7 @@ func EditPostHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		// Проверка, что пост можно редактировать
 		canEdit := false
+
 		loggedInUserID, err := GetUserIDFromSession(r)
 		if err == nil {
 			user, err := db.GetUserByID(dbConn, loggedInUserID)
@@ -38,20 +39,22 @@ func EditPostHandler(dbConn *sql.DB) http.HandlerFunc {
 				canEdit = true
 			}
 		}
-		notifications, err := db.GetUnreadNotifications(dbConn, loggedInUserID)
-		if err != nil {
-			http.Error(w, "Failed to fetch notifications", http.StatusInternalServerError)
-			return
-		}
-		data := map[string]interface{}{
-			"Post":                post,
-			"CanEdit":             canEdit,
-			"LoggedIn":            true,
-			"Notifications":       notifications,
-			"UnreadNotifications": len(notifications),
+
+		options := map[string]bool{
+			"notifications": true,
 		}
 
-		utils.RenderTemplate(w, "post/editPost.html", data)
+		pageData, err := utils.GetPageData(dbConn, loggedInUserID, options)
+		if err != nil {
+			http.Error(w, "Failed to fetch page data: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		pageData.Post = post
+		pageData.CanEdit = canEdit
+		pageData.Title = "Edit Post"
+
+		utils.RenderTemplate(w, "post/editPost.html", pageData)
 	}
 }
 
@@ -81,7 +84,7 @@ func UpdatePostHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		posts, err := db.GetAllPosts(dbConn, postID, 0)
+		posts, err := db.GetAllPosts(dbConn, postID, 0, "likes")
 		if err != nil {
 			http.Error(w, "Failed to get post", http.StatusInternalServerError)
 			return

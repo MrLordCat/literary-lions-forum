@@ -34,7 +34,7 @@ func GetCommentsForPost(db *sql.DB, postID int) ([]Comment, error) {
     LEFT JOIN comment_likes cl ON c.id = cl.comment_id
     WHERE c.post_id = ?
     GROUP BY c.id
-    ORDER BY c.created_at DESC
+    ORDER BY c.created_at ASC
     `
 	rows, err := db.Query(query, postID)
 	if err != nil {

@@ -29,17 +29,17 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		loggedInUserID, err := GetUserIDFromSession(r)
 		if err != nil {
-			http.Error(w, "You need to be logged in to view this page", http.StatusUnauthorized)
-			return
+			loggedInUserID = 0
 		}
 
 		options := map[string]bool{
-			"userPosts":  true,
-			"likedPosts": true,
+			"userPosts":     true,
+			"likedPosts":    true,
+			"notifications": true,
 		}
 
 		// Получаем данные для профиля другого пользователя
-		data, err := utils.GetPageData(dbConn, userID, options)
+		data, err := utils.GetPageData(dbConn, loggedInUserID, options)
 		if err != nil {
 			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -50,13 +50,26 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			http.Error(w, "Failed to fetch user data", http.StatusInternalServerError)
 			return
 		}
+		userPosts, err := db.GetAllPosts(dbConn, 0, int64(userID), "likes")
+		if err != nil {
+			http.Error(w, "Failed to fetch user posts", http.StatusInternalServerError)
+			return
+		}
 
+		likedPosts, err := db.GetLikedPosts(dbConn, userID)
+		if err != nil {
+			http.Error(w, "Failed to fetch liked posts", http.StatusInternalServerError)
+			return
+		}
 		isOwnProfile := loggedInUserID == userID
 
 		data.Title = user.Username + "'s Profile"
 		data.User = user
 		data.IsOwnProfile = isOwnProfile
-		data.Posts = data.UserPosts // Добавляем посты пользователя
+		data.Posts = userPosts // Обновляем с постами пользователя
+		data.LikedPosts = likedPosts
+
+		data.LoggedIn = loggedInUserID > 0
 
 		utils.RenderTemplate(w, "profile/profile.html", data)
 	}

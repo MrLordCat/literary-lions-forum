@@ -2,18 +2,25 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
+	"encoding/json"
 	"literary-lions-forum/handlers/db"
 	"net/http"
 	"strconv"
 )
 
 // Функция для добавления комментария в базу данных
-func AddComment(db *sql.DB, postID, authorID int, content string) error {
-	_, err := db.Exec("INSERT INTO comments (post_id, author_id, content) VALUES (?, ?, ?)", postID, authorID, content)
-	fmt.Println(content)
-	return err
+func AddComment(db *sql.DB, postID, authorID int, content string) (int, error) {
+	result, err := db.Exec("INSERT INTO comments (post_id, author_id, content) VALUES (?, ?, ?)", postID, authorID, content)
+	if err != nil {
+		return 0, err
+	}
 
+	commentID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(commentID), nil
 }
 
 func AddCommentHandler(dbConn *sql.DB) http.HandlerFunc {
@@ -40,14 +47,21 @@ func AddCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		err = AddComment(dbConn, postID, userID, content)
+		commentID, err := AddComment(dbConn, postID, userID, content)
 		if err != nil {
 			http.Error(w, "Failed to add comment", http.StatusInternalServerError)
 			return
 		}
 
-		// Получаем ID автора поста
-		authorPosts, err := db.GetAllPosts(dbConn, postID, 0)
+		// Получаем новый комментарий
+		newComment, err := db.GetCommentByID(dbConn, commentID)
+		if err != nil {
+			http.Error(w, "Failed to fetch new comment", http.StatusInternalServerError)
+			return
+		}
+
+		// Создаем уведомление для автора поста
+		authorPosts, err := db.GetAllPosts(dbConn, postID, 0, "likes")
 		if err != nil {
 			http.Error(w, "Failed to get post author", http.StatusInternalServerError)
 			return
@@ -59,8 +73,6 @@ func AddCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 		}
 
 		authorID := authorPosts[0].AuthorID
-
-		// Создаем уведомление для автора поста
 		contentNotification := "Your post has been commented on."
 		err = db.AddNotification(dbConn, authorID, postID, contentNotification)
 		if err != nil {
@@ -68,7 +80,8 @@ func AddCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Перенаправление обратно на страницу постов
-		http.Redirect(w, r, "/", http.StatusFound)
+		// Возвращаем JSON-ответ с новым комментарием
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(newComment)
 	}
 }

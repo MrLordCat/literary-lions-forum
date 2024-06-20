@@ -4,13 +4,13 @@ package utils
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"html/template"
 	"literary-lions-forum/handlers/db"
 	"log"
 	"net/http"
 	"path/filepath"
 	"sort"
-	"strings"
 
 	"github.com/russross/blackfriday/v2"
 )
@@ -29,7 +29,7 @@ func Dict(values ...interface{}) (map[string]interface{}, error) {
 	}
 	return dict, nil
 }
-func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) error {
+func RenderTemplate(w http.ResponseWriter, tmpl string, data PageData) error {
 	log.Println("Starting RenderTemplate")
 
 	funcMap := template.FuncMap{
@@ -83,7 +83,12 @@ type PageData struct {
 	TopUsers            []db.User
 	IsOwnProfile        bool
 	IsProfile           bool
-	SinglePost          db.Post
+	Post                db.Post
+	CategoryName        string
+	CanEdit             bool
+	IsDeleted           bool
+	Sort                string
+	CategoryID          int
 }
 
 func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData, error) {
@@ -108,7 +113,7 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 		}
 
 		if options["userPosts"] {
-			data.UserPosts, err = db.GetAllPosts(dbConn, 0, int64(userID))
+			data.UserPosts, err = db.GetAllPosts(dbConn, 0, int64(userID), "likes")
 			if err != nil {
 				return data, err
 			}
@@ -131,7 +136,7 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 	}
 
 	if options["posts"] {
-		data.Posts, err = db.GetAllPosts(dbConn, 0, 0)
+		data.Posts, err = db.GetAllPosts(dbConn, 0, 0, "likes")
 		if err != nil {
 			return data, err
 		}
@@ -175,12 +180,12 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 	}
 	var postID int
 	if options["singlePost"] {
-		posts, err := db.GetAllPosts(dbConn, postID, 0)
+		posts, err := db.GetAllPosts(dbConn, postID, 0, "likes")
 		if err != nil {
 			return data, err
 		}
 		if len(posts) > 0 {
-			data.SinglePost = posts[0]
+			data.Post = posts[0]
 		}
 	}
 	// Установка значения IsProfile
@@ -201,7 +206,18 @@ func RenderPostContent(content string) template.HTML {
 		blackfriday.BackslashLineBreak |
 		blackfriday.DefinitionLists |
 		blackfriday.AutoHeadingIDs
-	content = strings.ReplaceAll(content, "\n", "<br>")
-	output := blackfriday.Run([]byte(content), blackfriday.WithExtensions(extensions))
-	return template.HTML(output)
+
+	renderer := blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
+		Flags: blackfriday.UseXHTML |
+			blackfriday.Smartypants |
+			blackfriday.SmartypantsFractions |
+			blackfriday.SmartypantsDashes |
+			blackfriday.SmartypantsLatexDashes,
+	})
+
+	output := blackfriday.Run([]byte(content), blackfriday.WithRenderer(renderer), blackfriday.WithExtensions(extensions))
+
+	// Оборачиваем результат в <div> с стилем white-space: pre-wrap
+	htmlContent := fmt.Sprintf("<div style=\"white-space: pre-wrap;\">%s</div>", output)
+	return template.HTML(htmlContent)
 }

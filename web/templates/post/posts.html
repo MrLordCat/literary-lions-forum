@@ -1,5 +1,7 @@
 {{define "posts"}}
 <link rel="stylesheet" href="/static/css/posts.css">
+<link rel="stylesheet" href="/static/css/buttons.css">
+<link rel="stylesheet" href="/static/css/comments.css">
 <script>
     function editPost(postID) {
         window.location.href = `/editPost?postID=${postID}`;
@@ -7,6 +9,17 @@
 </script>
 <div class="posts-section">
     <h2>{{if .IsProfile}}Your Posts{{else}}Posts{{end}}</h2>
+    {{if not .IsProfile}}
+    {{if not .CategoryID}}
+    <form method="GET" action="/">
+        <label for="sort">Sort by:</label>
+        <select name="sort" id="sort" onchange="this.form.submit()">
+            <option value="likes" {{if eq .Sort "likes"}}selected{{end}}>Likes</option>
+            <option value="date" {{if eq .Sort "date"}}selected{{end}}>Date</option>
+        </select>
+    </form>
+    {{end}}
+    {{end}}
     <div class="posts-list">
         {{range .Posts}}
             {{if not .IsDeleted}}

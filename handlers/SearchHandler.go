@@ -32,38 +32,17 @@ func SearchHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		options := map[string]bool{
 			"notifications": true,
+			"IsAdmin":       isAdmin,
 		}
 		pageData, err := utils.GetPageData(dbConn, loggedInUserID, options)
 		if err != nil {
-			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Failed to fetch page data: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		data := map[string]interface{}{
-			"Results":             results,
-			"Title":               "Search Results",
-			"LoggedIn":            true,
-			"IsAdmin":             isAdmin,
-			"Notifications":       pageData.Notifications,
-			"UnreadNotifications": pageData.UnreadNotifications,
-		}
+		pageData.Title = "Search Results"
+		pageData.Posts = results.Posts
 
-		// Подготовка данных для шаблона posts
-		postsData := struct {
-			IsProfile     bool
-			IsAdmin       bool
-			Notifications []db.Notification
-			Posts         []db.Post
-		}{
-			IsProfile:     false,
-			IsAdmin:       isAdmin,
-			Posts:         results.Posts,
-			Notifications: pageData.Notifications,
-		}
-
-		// Включение данных для шаблона posts
-		data["PostsData"] = postsData
-
-		utils.RenderTemplate(w, "searchResults.html", data)
+		utils.RenderTemplate(w, "searchResults.html", pageData)
 	}
 }

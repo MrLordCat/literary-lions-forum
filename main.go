@@ -34,7 +34,7 @@ func main() {
 	r.HandleFunc("/profile", handlers.UserProfileHandler(database)).Methods("GET")
 	r.HandleFunc("/create-post", handlers.PostCreateFormHandler(database)).Methods("GET", "POST")
 	r.HandleFunc("/register", handlers.RegisterHandler(database)).Methods("GET", "POST")
-	r.HandleFunc("/posts", handlers.PostsHandler(database)).Methods("GET")
+	//r.HandleFunc("/posts", handlers.PostsHandler(database)).Methods("GET")
 	r.HandleFunc("/users", handlers.UsersHandler(database)).Methods("GET")
 	r.HandleFunc("/login", handlers.LoginHandler(database)).Methods("GET", "POST")
 	r.HandleFunc("/add-comment", handlers.AddCommentHandler(database)).Methods("POST")

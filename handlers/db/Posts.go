@@ -17,7 +17,7 @@ func CreatePost(db *sql.DB, title, content string, authorID, categoryID int) err
 	return err
 }
 
-func GetAllPosts(db *sql.DB, postID int, userID int64) ([]Post, error) {
+func GetAllPosts(db *sql.DB, postID int, userID int64, sortBy string) ([]Post, error) {
 	var query strings.Builder
 	query.WriteString(`
 	SELECT p.id, p.title, p.content, u.username, u.id as author_id, p.created_at, p.is_deleted,
@@ -26,8 +26,7 @@ func GetAllPosts(db *sql.DB, postID int, userID int64) ([]Post, error) {
 	FROM posts p
 	LEFT JOIN users u ON p.author_id = u.id
 	LEFT JOIN post_likes pl ON p.id = pl.post_id
-	
-    `)
+	`)
 
 	var args []interface{}
 	whereClauses := []string{}
@@ -44,7 +43,16 @@ func GetAllPosts(db *sql.DB, postID int, userID int64) ([]Post, error) {
 		query.WriteString(" WHERE " + strings.Join(whereClauses, " AND "))
 	}
 
-	query.WriteString(" GROUP BY p.id, p.title, p.content, u.username, u.id, p.created_at ORDER BY likes DESC")
+	query.WriteString(" GROUP BY p.id, p.title, p.content, u.username, u.id, p.created_at")
+
+	switch sortBy {
+	case "date":
+		query.WriteString(" ORDER BY p.created_at DESC")
+	case "likes":
+		query.WriteString(" ORDER BY likes DESC")
+	default:
+		query.WriteString(" ORDER BY likes DESC")
+	}
 
 	rows, err := db.Query(query.String(), args...)
 	if err != nil {
@@ -71,10 +79,9 @@ func GetAllPosts(db *sql.DB, postID int, userID int64) ([]Post, error) {
 		posts = append(posts, p)
 	}
 	return posts, nil
-
 }
 
-func GetPostsByCategory(db *sql.DB, categoryID int64) ([]Post, error) {
+func GetPostsByCategory(db *sql.DB, categoryID int, sort string) ([]Post, error) {
 	posts := []Post{}
 	query := `
 	SELECT p.id, p.title, p.content, u.username as author_name, p.author_id, p.created_at, p.category_id,
@@ -85,8 +92,16 @@ func GetPostsByCategory(db *sql.DB, categoryID int64) ([]Post, error) {
 	LEFT JOIN post_likes pl ON p.id = pl.post_id
 	WHERE p.category_id = ? AND p.is_deleted = 0
 	GROUP BY p.id, p.title, p.content, u.username, p.author_id, p.created_at
-	ORDER BY p.created_at DESC
 	`
+
+	switch sort {
+	case "date":
+		query += " ORDER BY p.created_at DESC"
+	case "likes":
+		fallthrough
+	default:
+		query += " ORDER BY likes DESC"
+	}
 
 	rows, err := db.Query(query, categoryID)
 	if err != nil {

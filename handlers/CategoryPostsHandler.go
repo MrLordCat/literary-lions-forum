@@ -2,9 +2,8 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
-	"html/template"
 	"literary-lions-forum/handlers/db"
+	"literary-lions-forum/utils"
 	"log"
 	"net/http"
 	"strconv"
@@ -17,9 +16,25 @@ func CategoryPostsHandler(dbConn *sql.DB) http.HandlerFunc {
 			http.Error(w, "Category ID is required", http.StatusBadRequest)
 			return
 		}
-		categoryID, err := strconv.ParseInt(categoryIDStr, 10, 64)
+		categoryID, err := strconv.Atoi(categoryIDStr)
 		if err != nil {
 			http.Error(w, "Invalid category ID", http.StatusBadRequest)
+			return
+		}
+
+		sort := r.URL.Query().Get("sort")
+		if sort == "" {
+			sort = "likes"
+		}
+
+		options := map[string]bool{
+			"notifications": true,
+			"categories":    true,
+		}
+
+		pageData, err := utils.GetPageData(dbConn, 0, options)
+		if err != nil {
+			http.Error(w, "Failed to fetch page data: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -30,23 +45,22 @@ func CategoryPostsHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		posts, err := db.GetPostsByCategory(dbConn, categoryID)
+		posts, err := db.GetPostsByCategory(dbConn, categoryID, sort)
 		if err != nil {
 			http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
 			return
 		}
-		fmt.Println(categoryName)
-		tmpl := template.Must(template.ParseFiles("web/templates/post/sortedPosts.html"))
-		err = tmpl.Execute(w, map[string]interface{}{
-			"Posts":        posts,
-			"CategoryID":   categoryID,
-			"CategoryName": categoryName, // Передаем имя категории в шаблон
-		})
-		log.Printf("Rendering posts for category: %s with ID %d", categoryName, categoryID)
 
+		pageData.CategoryName = categoryName
+		pageData.Posts = posts
+		pageData.Title = "Sorted Posts by Category"
+		pageData.Sort = sort
+		pageData.CategoryID = categoryID // добавляем ID категории в данные страницы
+
+		err = utils.RenderTemplate(w, "post/sortedPosts.html", pageData)
 		if err != nil {
+			log.Printf("Error rendering template: %v", err)
 			http.Error(w, "Failed to render template", http.StatusInternalServerError)
-			return
 		}
 	}
 }

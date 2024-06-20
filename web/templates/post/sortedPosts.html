@@ -1,39 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Sorted Posts by Category</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-    <h1>Posts Sorted by Category: {{.CategoryName}}</h1>
-
-    {{range .Posts}}
-    <div class="post">
-        <h2><a href="/postView?postID={{.ID}}">{{.Title}}</a></h2>
-        <p>{{.Content}}</p>
-        <div>Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</div>
-        <small>Posted by {{.AuthorName}} at {{.CreatedAt}}</small>
-        <h3>Comments:</h3>
-        {{if .Comments}}
-        <ul>
-            {{range .Comments}}
-            <li>
-                {{.Content}}
-                <br><small>Posted at {{.CreatedAt}}</small>
-            </li>
-            {{end}}
-        </ul>
-        {{else}}
-        <p>No comments yet.</p>
-        {{end}}
-    </div>
-    {{else}}
+{{define "content"}}
+<link rel="stylesheet" href="/static/css/posts.css">
+<link rel="stylesheet" href="/static/css/buttons.css">
+<link rel="stylesheet" href="/static/css/comments.css">
+<h1>Posts Sorted by Category: {{.CategoryName}}</h1>
+{{if .Posts}}
+    <form method="GET" action="/sortedPosts">
+        <input type="hidden" name="category_id" value="{{.CategoryID}}">
+        <label for="sort">Sort by:</label>
+        <select name="sort" id="sort" onchange="this.form.submit()">
+            <option value="likes" {{if eq .Sort "likes"}}selected{{end}}>Likes</option>
+            <option value="date" {{if eq .Sort "date"}}selected{{end}}>Date</option>
+        </select>
+    </form>
+    {{template "posts" .}}
+{{else}}
     <p>No posts available in this category.</p>
-    {{end}}
-    
-    <div>
-        <a href="/"><button>Back to Home</button></a>
-    </div>
-</body>
-</html>
+{{end}}
+{{end}}
