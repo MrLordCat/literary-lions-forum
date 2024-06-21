@@ -21,17 +21,20 @@ func InitDB() *sql.DB {
 
 func CreateTables(db *sql.DB) {
 	query := `
-	CREATE TABLE IF NOT EXISTS posts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        author_id INTEGER,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        category_id INTEGER,
-		is_deleted BOOLEAN DEFAULT FALSE,
-        FOREIGN KEY (author_id) REFERENCES users(id),
-        FOREIGN KEY (category_id) REFERENCES categories(id)
-    );
+CREATE TABLE IF NOT EXISTS posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    author_id INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    category_id INTEGER,
+    image1_path TEXT,
+    image2_path TEXT,
+    image3_path TEXT,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (author_id) REFERENCES users(id),
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		username TEXT UNIQUE NOT NULL,

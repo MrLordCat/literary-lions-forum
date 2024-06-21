@@ -1,13 +1,42 @@
 {{define "post"}}
 <div class="post">
+    <small class="post-category">
+        <a href="/sortedPosts?category_id={{.Post.CategoryName}}">/{{.Post.CategoryName}}</a>
+    </small>
     <h3><a href="/postView?postID={{.Post.ID}}">{{.Post.Title}}</a></h3>
     <div class="post-content markdown-body">{{renderPostContent .Post.Content}}</div>
+
+    {{if or .Post.Image1Path .Post.Image2Path .Post.Image3Path}}
+    <div class="post-images" id="carousel-{{.Post.ID}}">
+        <div class="carousel">
+            {{if .Post.Image1Path}}
+            <div class="carousel-item active">
+                <img src="/{{.Post.Image1Path}}" alt="Image 1">
+            </div>
+            {{end}}
+            {{if .Post.Image2Path}}
+            <div class="carousel-item">
+                <img src="/{{.Post.Image2Path}}" alt="Image 2">
+            </div>
+            {{end}}
+            {{if .Post.Image3Path}}
+            <div class="carousel-item">
+                <img src="/{{.Post.Image3Path}}" alt="Image 3">
+            </div>
+            {{end}}
+        </div>
+        <button class="carousel-control prev" onclick="prevImage({{.Post.ID}})">❮</button>
+        <button class="carousel-control next" onclick="nextImage({{.Post.ID}})">❯</button>
+    </div>
+    {{end}}
+
     <div class="post-actions">
         {{template "postActions" .}}
     </div>
-    <small class="post-meta">Posted by {{.Post.AuthorName}} at <span class="post-date">{{.Post.CreatedAt}}</span></small>
+    <small class="post-meta">Posted by {{.Post.AuthorName}} <span class="post-date">{{timeSince .Post.CreatedAt}}</span></small>
     <div class="comments-section">
         {{template "comments" .}}
     </div>
 </div>
+<script src="/static/js/post.js"></script>
 {{end}}

@@ -27,7 +27,6 @@ func SearchAll(db *sql.DB, query string) (SearchResult, error) {
 }
 func SearchPosts(db *sql.DB, searchText string) ([]Post, error) {
 	// Используйте searchText для модификации SQL запроса
-	fmt.Println("search", searchText)
 	posts := []Post{}
 	query := `SELECT p.id, p.title, p.content, u.username AS author_name, p.author_id, p.created_at, p.category_id,
 	COALESCE(SUM(CASE WHEN pl.like_type = 1 THEN 1 ELSE 0 END), 0) AS likes,

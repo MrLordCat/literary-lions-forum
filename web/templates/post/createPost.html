@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="/static/css/createPost.css">
 <div class="form-container">
     <h1>Create New Post</h1>
-    <form method="POST" action="/create-post">
+    <form method="POST" action="/create-post" enctype="multipart/form-data">
         <label for="title">Title:</label>
         <input type="text" id="title" name="title" required><br>
         <label for="content">Content:</label>
@@ -13,6 +13,12 @@
                 <option value="{{.ID}}">{{.Name}}</option>
             {{end}}
         </select><br>
+        <label for="image1">Image 1:</label>
+        <input type="file" id="image1" name="image1"><br>
+        <label for="image2">Image 2:</label>
+        <input type="file" id="image2" name="image2"><br>
+        <label for="image3">Image 3:</label>
+        <input type="file" id="image3" name="image3"><br>
         <button type="submit" class="btn">Create Post</button>
         <a href="/" class="btn">Cancel</a>
     </form>

@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"net/mail"
 
@@ -11,7 +12,9 @@ import (
 
 func CreateUser(db *sql.DB, username, email, password string, isAdmin bool) error {
 	// Проверка формата email
+	fmt.Println("EMAIL +++", email)
 	_, err := mail.ParseAddress(email)
+
 	if err != nil {
 		return errors.New("invalid email format")
 	}

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"literary-lions-forum/handlers/db"
 	"log"
 	"net/http"
@@ -14,19 +15,19 @@ import (
 func LoginHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			ErrorHandler(w, http.StatusMethodNotAllowed, "Method not allowed")
 			return
 		}
 
 		login := r.FormValue("login")
 		password := r.FormValue("password")
-
+		fmt.Println("LOGIN: ", login, password)
 		user, err := db.GetUserByUsernameOrEmail(dbConn, login)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				http.Error(w, "User not found", http.StatusBadRequest)
+				ErrorHandler(w, http.StatusBadRequest, "User not found")
 			} else {
-				http.Error(w, "Database error", http.StatusInternalServerError)
+				ErrorHandler(w, http.StatusInternalServerError, "Database error")
 			}
 			return
 		}
@@ -34,7 +35,7 @@ func LoginHandler(dbConn *sql.DB) http.HandlerFunc {
 		// Сравнение предоставленного пароля с хэшированным паролем в базе данных
 		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 		if err != nil {
-			http.Error(w, "Invalid password", http.StatusUnauthorized)
+			ErrorHandler(w, http.StatusUnauthorized, "Invalid password")
 			return
 		}
 
@@ -71,7 +72,7 @@ func GetUserIDFromSession(r *http.Request) (int, error) {
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Logout requested with method: %s", r.Method)
 	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		ErrorHandler(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 

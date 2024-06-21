@@ -4,13 +4,13 @@
     display: inline-block;
 }
 #notif {
-    color: black;
+    color: rgba(0, 0, 0, 0.737);
 }
 .notifications-content {
     display: none;
     position: absolute;
     right: 0;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.558);
     min-width: 300px;
     max-width: 400px;
     max-height: 400px;
@@ -29,7 +29,7 @@
 }
 
 .notifications-content a:hover {
-    background-color: #ddd;
+    background-color: #dddddd87;
 }
 
 .notification-button {
@@ -44,7 +44,7 @@
     top: -10px;
     right: -10px;
     background-color: red;
-    color: white;
+    color: rgba(255, 255, 255, 0.724);
     border-radius: 50%;
     padding: 5px 10px;
     font-size: 12px;

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +8,7 @@
     <link rel="stylesheet" href="/static/css/notif.css">
     <link rel="stylesheet" href="/static/css/usersList.css">
     {{block "styles" .}}{{end}}
+    <script src="/static/js/errors.js"></script>
 </head>
 <body>
     <header>
@@ -44,10 +44,13 @@
                         <form method="POST" action="/register">
                             <label for="username">Username:</label>
                             <input type="text" id="username" name="username" required><br>
+                            <div id="username-error" class="error-message"></div>
                             <label for="email">Email:</label>
                             <input type="email" id="email" name="email" required><br>
+                            <div id="email-error" class="error-message"></div>
                             <label for="password">Password:</label>
                             <input type="password" id="password" name="password" required><br>
+                            <div id="password-error" class="error-message"></div>
                             <button type="submit">Register</button>
                         </form>
                     </div>
@@ -55,11 +58,13 @@
                 <div class="dropdown">
                     <button id="logout" class="navbar-item dropdown-toggle" onclick="toggleDropdown('login-dropdown')">Login</button>
                     <div id="login-dropdown" class="dropdown-content hidden">
-                        <form method="POST" action="/login">
+                        <form id="login-form" method="POST" action="/login">
                             <label for="login">Username or Email:</label>
                             <input type="text" id="login" name="login" required><br>
+                            <div id="login-error" class="error-message"></div>
                             <label for="password">Password:</label>
                             <input type="password" id="password" name="password" required><br>
+                            <div id="password-error" class="error-message"></div>
                             <button type="submit">Login</button>
                         </form>
                     </div>
@@ -67,7 +72,7 @@
             {{end}}
         </nav>
     </header>
-    <main>
+    <main class="content">
         {{template "content" .}}
     </main>
     <footer>

@@ -10,25 +10,7 @@ func GetUserByID(db *sql.DB, userID int) (User, error) {
 	err := db.QueryRow(query, userID).Scan(&user.ID, &user.Username, &user.Email, &user.PasswordHash, &user.FirstName, &user.LastName, &user.Karma, &user.IsAdmin)
 	return user, err
 }
-func GetUserPosts(db *sql.DB, userID int) ([]Post, error) {
-	query := `SELECT id, title, content, author_id, created_at, is_deleted FROM posts WHERE author_id = ?`
-	rows, err := db.Query(query, userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
 
-	var posts []Post
-	for rows.Next() {
-		var post Post
-		err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.AuthorID, &post.CreatedAt, &post.IsDeleted)
-		if err != nil {
-			return nil, err
-		}
-		posts = append(posts, post)
-	}
-	return posts, nil
-}
 func GetLikedPosts(db *sql.DB, userID int) ([]Post, error) {
 	query := `SELECT p.id, p.title, p.content, p.author_id, p.created_at, p.is_deleted
               FROM post_likes pl

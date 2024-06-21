@@ -1,5 +1,6 @@
 /* base.css */
 body {
+    background: url('/static/img/cat.jpg') no-repeat center center fixed;
     font-family: 'Roboto', sans-serif;
     background-color: #f6f7f8;
     color: #1a1a1b;
@@ -8,8 +9,21 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-size: cover;
+    position: relative;
 }
 
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    filter: blur(5px);
+    z-index: -1;
+}
 .wrapper {
     display: flex;
     flex-direction: column;
@@ -86,7 +100,7 @@ main {
 footer {
     text-align: center;
     padding: 2px;
-    background-color: #b5481d;
+    background-color: #b5481dc9;
     color: white;
     width: 100%;
     flex-shrink: 0; /* Ensure footer doesn't shrink */

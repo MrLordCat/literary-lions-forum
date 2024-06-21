@@ -8,14 +8,14 @@
     }
 </script>
 <div class="posts-section">
-    <h2>{{if .IsProfile}}Your Posts{{else}}Posts{{end}}</h2>
+    <h2 class="posts-title">{{if .IsProfile}}Your Posts{{else}}Posts{{end}}</h2>
     {{if not .IsProfile}}
     {{if not .CategoryID}}
-    <form method="GET" action="/">
+    <form method="GET" action="/" class="sort-form">
         <label for="sort">Sort by:</label>
         <select name="sort" id="sort" onchange="this.form.submit()">
-            <option value="likes" {{if eq .Sort "likes"}}selected{{end}}>Likes</option>
             <option value="date" {{if eq .Sort "date"}}selected{{end}}>Date</option>
+            <option value="likes" {{if eq .Sort "likes"}}selected{{end}}>Likes</option>
         </select>
     </form>
     {{end}}

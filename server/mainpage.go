@@ -16,7 +16,7 @@ func MainPageHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		sortBy := r.URL.Query().Get("sort")
 		if sortBy == "" {
-			sortBy = "likes" // Сортировка по умолчанию
+			sortBy = "p.created_at DESC" // Сортировка по умолчанию
 		}
 
 		options := map[string]bool{

@@ -25,10 +25,14 @@ type Post struct {
 	AuthorName string
 	CreatedAt  time.Time
 	CategoryID sql.NullString
+	CategoryName string 
 	Comments   []Comment
 	Likes      int
 	Dislikes   int
 	IsDeleted  bool
+	Image1Path string
+	Image2Path string
+	Image3Path string
 }
 type Comment struct {
 	ID         int

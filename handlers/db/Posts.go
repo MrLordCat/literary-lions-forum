@@ -6,14 +6,11 @@ import (
 	"strings"
 )
 
-func CreatePost(db *sql.DB, title, content string, authorID, categoryID int) error {
-	stmt, err := db.Prepare("INSERT INTO posts (title, content, author_id, category_id) VALUES (?, ?, ?, ?)")
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(title, content, authorID, categoryID)
+func CreatePost(db *sql.DB, title, content string, authorID, categoryID int, image1Path, image2Path, image3Path string) error {
+	_, err := db.Exec(`
+		INSERT INTO posts (title, content, author_id, category_id, image1_path, image2_path, image3_path, created_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+	`, title, content, authorID, categoryID, image1Path, image2Path, image3Path)
 	return err
 }
 
@@ -22,10 +19,13 @@ func GetAllPosts(db *sql.DB, postID int, userID int64, sortBy string) ([]Post, e
 	query.WriteString(`
 	SELECT p.id, p.title, p.content, u.username, u.id as author_id, p.created_at, p.is_deleted,
 	COALESCE(SUM(CASE WHEN pl.like_type = 1 THEN 1 ELSE 0 END), 0) AS likes,
-	COALESCE(SUM(CASE WHEN pl.like_type = -1 THEN 1 ELSE 0 END), 0) AS dislikes
+	COALESCE(SUM(CASE WHEN pl.like_type = -1 THEN 1 ELSE 0 END), 0) AS dislikes,
+	p.image1_path, p.image2_path, p.image3_path,
+	c.name as category_name
 	FROM posts p
 	LEFT JOIN users u ON p.author_id = u.id
 	LEFT JOIN post_likes pl ON p.id = pl.post_id
+	LEFT JOIN categories c ON p.category_id = c.id
 	`)
 
 	var args []interface{}
@@ -43,15 +43,15 @@ func GetAllPosts(db *sql.DB, postID int, userID int64, sortBy string) ([]Post, e
 		query.WriteString(" WHERE " + strings.Join(whereClauses, " AND "))
 	}
 
-	query.WriteString(" GROUP BY p.id, p.title, p.content, u.username, u.id, p.created_at")
+	query.WriteString(" GROUP BY p.id, p.title, p.content, u.username, u.id, p.created_at, p.image1_path, p.image2_path, p.image3_path, c.name")
 
 	switch sortBy {
-	case "date":
-		query.WriteString(" ORDER BY p.created_at DESC")
 	case "likes":
 		query.WriteString(" ORDER BY likes DESC")
+	case "date":
+		fallthrough
 	default:
-		query.WriteString(" ORDER BY likes DESC")
+		query.WriteString(" ORDER BY p.created_at DESC")
 	}
 
 	rows, err := db.Query(query.String(), args...)
@@ -66,7 +66,8 @@ func GetAllPosts(db *sql.DB, postID int, userID int64, sortBy string) ([]Post, e
 		var p Post
 		var authorName sql.NullString
 		var authorID sql.NullInt64
-		err := rows.Scan(&p.ID, &p.Title, &p.Content, &authorName, &authorID, &p.CreatedAt, &p.IsDeleted, &p.Likes, &p.Dislikes)
+		var image1Path, image2Path, image3Path sql.NullString
+		err := rows.Scan(&p.ID, &p.Title, &p.Content, &authorName, &authorID, &p.CreatedAt, &p.IsDeleted, &p.Likes, &p.Dislikes, &image1Path, &image2Path, &image3Path, &p.CategoryName)
 		if err != nil {
 			fmt.Println("Error scanning post:", err)
 			continue
@@ -74,6 +75,15 @@ func GetAllPosts(db *sql.DB, postID int, userID int64, sortBy string) ([]Post, e
 		p.AuthorName = authorName.String
 		if authorID.Valid {
 			p.AuthorID = int(authorID.Int64)
+		}
+		if image1Path.Valid {
+			p.Image1Path = image1Path.String
+		}
+		if image2Path.Valid {
+			p.Image2Path = image2Path.String
+		}
+		if image3Path.Valid {
+			p.Image3Path = image3Path.String
 		}
 		p.Comments, _ = GetCommentsForPost(db, p.ID)
 		posts = append(posts, p)
@@ -95,12 +105,12 @@ func GetPostsByCategory(db *sql.DB, categoryID int, sort string) ([]Post, error)
 	`
 
 	switch sort {
-	case "date":
-		query += " ORDER BY p.created_at DESC"
 	case "likes":
+		query += " ORDER BY likes DESC"
+	case "date":
 		fallthrough
 	default:
-		query += " ORDER BY likes DESC"
+		query += " ORDER BY p.created_at DESC"
 	}
 
 	rows, err := db.Query(query, categoryID)
@@ -127,7 +137,7 @@ func GetPostsByCategory(db *sql.DB, categoryID int, sort string) ([]Post, error)
 	return posts, nil
 }
 
-func UpdateOrDeletePost(db *sql.DB, postID int, title, content string, delete bool) error {
+func UpdateOrDeletePost(db *sql.DB, postID int, title, content, image1Path, image2Path, image3Path string, delete bool) error {
 	if delete {
 		// Устанавливаем пост как удаленный и очищаем содержимое
 		query := `UPDATE posts SET title = '', content = '', is_deleted = 1 WHERE id = ?`
@@ -136,9 +146,14 @@ func UpdateOrDeletePost(db *sql.DB, postID int, title, content string, delete bo
 			return fmt.Errorf("error marking post as deleted: %v", err)
 		}
 	} else {
-		// Обновляем пост с новым заголовком и содержимым
-		query := `UPDATE posts SET title = ?, content = ? WHERE id = ?`
-		_, err := db.Exec(query, title, content, postID)
+		// Обновляем пост с новым заголовком, содержимым и изображениями
+		fmt.Println(image1Path)
+		query := `UPDATE posts SET title = ?, content = ?, 
+            image1_path = CASE WHEN ? = 'DELETE' THEN NULL WHEN ? != '' THEN ? ELSE image1_path END, 
+            image2_path = CASE WHEN ? = 'DELETE' THEN NULL WHEN ? != '' THEN ? ELSE image2_path END, 
+            image3_path = CASE WHEN ? = 'DELETE' THEN NULL WHEN ? != '' THEN ? ELSE image3_path END 
+            WHERE id = ?`
+		_, err := db.Exec(query, title, content, image1Path, image1Path, image1Path, image2Path, image2Path, image2Path, image3Path, image3Path, image3Path, postID)
 		if err != nil {
 			return fmt.Errorf("error updating post: %v", err)
 		}

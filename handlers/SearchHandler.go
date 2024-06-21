@@ -41,7 +41,8 @@ func SearchHandler(dbConn *sql.DB) http.HandlerFunc {
 		}
 
 		pageData.Title = "Search Results"
-		pageData.Posts = results.Posts
+		pageData.SearchResults.Posts = results.Posts
+		pageData.SearchResults.Users = results.Users
 
 		utils.RenderTemplate(w, "searchResults.html", pageData)
 	}

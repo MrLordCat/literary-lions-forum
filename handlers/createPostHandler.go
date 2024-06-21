@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql" // Импортируем твой пакет db
+	"fmt"
 	"literary-lions-forum/handlers/db"
 	"literary-lions-forum/utils"
 	"net/http"
@@ -31,7 +32,6 @@ func PostCreateFormHandler(dbConn *sql.DB) http.HandlerFunc {
 			utils.RenderTemplate(w, "/post/createPost.html", data)
 
 		case "POST":
-
 			// Получение ID пользователя из сессии
 			userID, err := GetUserIDFromSession(r)
 			if err != nil {
@@ -53,9 +53,18 @@ func PostCreateFormHandler(dbConn *sql.DB) http.HandlerFunc {
 				return
 			}
 
-			// Создание поста с учётом категории
+			// Сохранение изображений
+			imagePaths := make([]string, 3)
+			for i := 0; i < 3; i++ {
+				formFile := fmt.Sprintf("image%d", i+1)
+				imagePath, err := SaveUploadedFile(r, formFile)
+				if err == nil {
+					imagePaths[i] = imagePath
+				}
+			}
 
-			if err := db.CreatePost(dbConn, title, content, userID, categoryID); err != nil {
+			// Создание поста с учетом изображений
+			if err := db.CreatePost(dbConn, title, content, userID, categoryID, imagePaths[0], imagePaths[1], imagePaths[2]); err != nil {
 				http.Error(w, "Failed to save post: "+err.Error(), http.StatusInternalServerError)
 				return
 			}

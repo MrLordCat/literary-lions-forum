@@ -5,8 +5,6 @@ import (
 	"literary-lions-forum/handlers/db"
 	"literary-lions-forum/utils"
 	"net/http"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func ProfileEditHandler(dbConn *sql.DB) http.HandlerFunc {
@@ -64,19 +62,8 @@ func UpdateProfileHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Хеширование нового пароля, если он введен
-		var hashedPassword string
-		if newPassword != "" {
-			hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
-			if err != nil {
-				http.Error(w, "Failed to hash new password", http.StatusInternalServerError)
-				return
-			}
-			hashedPassword = string(hashedPasswordBytes)
-		}
-
 		// Обновление профиля пользователя
-		if err := db.UpdateUser(dbConn, userID, username, firstName, lastName, hashedPassword); err != nil {
+		if err := db.UpdateUser(dbConn, userID, username, firstName, lastName, newPassword); err != nil {
 			http.Error(w, "Failed to update user profile", http.StatusInternalServerError)
 			return
 		}

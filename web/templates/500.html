@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>500 - Internal Server Error</title>
+    <link rel="stylesheet" href="/static/css/error.css">
+</head>
+<body>
+    <div class="error-container">
+        <h1>500 - Internal Server Error</h1>
+        <p>Something went wrong. Please try again later.</p>
+        <a href="/" class="btn">Go to Home</a>
+    </div>
+</body>
+</html>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Удаляем кнопки входа и регистрации
+        var registerButton = document.querySelector('button[onclick="toggleDropdown(\'register-dropdown\')"]');
+        var loginButton = document.querySelector('button[onclick="toggleDropdown(\'login-dropdown\')"]');
+
+        if (registerButton) {
+            registerButton.remove();
+        }
+        if (loginButton) {
+            loginButton.remove();
+        }
+    });
+</script>
+{{end}}

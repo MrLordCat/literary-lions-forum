@@ -1,35 +1,40 @@
 {{define "content"}}
-    <link rel="stylesheet" href="/static/css/searchResults.css">
-    <h1>Search Results</h1>
+<link rel="stylesheet" href="/static/css/searchResults.css">
+<h1>{{.Title}}</h1>
 
-    <div class="results-container">
-        <div class="posts-section">
-            <h2>Posts</h2>
-            {{if .Results.Posts}}
-                {{template "posts" .PostsData}}
-            {{else}}
+<div class="results-container">
+    <div class="posts-section">
+        <h2>Posts</h2>
+        {{if .SearchResults.Posts}}
+            {{range .SearchResults.Posts}}
                 <div class="post-card">
-                    <p>No posts found.</p>
+                    <h3><a href="/postView?postID={{.ID}}">{{.Title}}</a></h3>
+                    <div class="post-content">{{renderPostContent .Content}}</div>
                 </div>
             {{end}}
-        </div>
-
-        <div class="users-list">
-            <h2>Users</h2>
-            {{if .Results.Users}}
-                {{range .Results.Users}}
-                    <div class="user-card">
-                        <h3><a href="/user/{{.ID}}">{{.Username}}</a></h3>
-                        <p>Email: {{.Email}}</p>
-                    </div>
-                {{end}}
-            {{else}}
-                <div class="user-card">
-                    <p>No users found.</p>
-                </div>
-            {{end}}
-        </div>
+        {{else}}
+            <div class="post-card">
+                <p>No posts found.</p>
+            </div>
+        {{end}}
     </div>
 
-    <a href="/"><button class="btn">Back to Home</button></a>
+    <div class="users-list">
+        <h2>Users</h2>
+        {{if .SearchResults.Users}}
+            {{range .SearchResults.Users}}
+                <div class="user-card">
+                    <h3><a href="/user/{{.ID}}">{{.Username}}</a></h3>
+                    <p>Email: {{.Email}}</p>
+                </div>
+            {{end}}
+        {{else}}
+            <div class="user-card">
+                <p>No users found.</p>
+            </div>
+        {{end}}
+    </div>
+</div>
+
+<a href="/"><button class="btn">Back to Home</button></a>
 {{end}}

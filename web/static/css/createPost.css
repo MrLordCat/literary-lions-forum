@@ -1,7 +1,7 @@
 
 
 .form-container {
-    background-color: white;
+    background-color: rgba(198, 171, 127, 0.672);;
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -55,7 +55,7 @@ input, textarea, select {
     border-radius: 4px;
 }
 .form-container .post-preview {
-    background-color: #f9f9f9;
+    background-color: rgba(215, 207, 191, 0.742);;
     padding: 1rem;
     margin-top: 1rem;
     border-radius: 8px;
@@ -71,6 +71,7 @@ input, textarea, select {
 .post-preview .post-content {
     white-space: pre-wrap;
     font-size: 1rem;
+    
 }
 .btn {
     background-color: #ff4500;

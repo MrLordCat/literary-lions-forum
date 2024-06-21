@@ -57,7 +57,6 @@ func EditPostHandler(dbConn *sql.DB) http.HandlerFunc {
 		utils.RenderTemplate(w, "post/editPost.html", pageData)
 	}
 }
-
 func UpdatePostHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
@@ -104,7 +103,7 @@ func UpdatePostHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		if r.FormValue("action") == "delete" {
 			// Обрабатываем удаление поста
-			if err := db.UpdateOrDeletePost(dbConn, postID, "", "", true); err != nil {
+			if err := db.UpdateOrDeletePost(dbConn, postID, "", "", "", "", "", true); err != nil {
 				http.Error(w, "Failed to delete post", http.StatusInternalServerError)
 				return
 			}
@@ -115,7 +114,36 @@ func UpdatePostHandler(dbConn *sql.DB) http.HandlerFunc {
 		// Обрабатываем обновление поста
 		title := r.FormValue("title")
 		content := r.FormValue("content")
-		if err := db.UpdateOrDeletePost(dbConn, postID, title, content, false); err != nil {
+
+		// Обработка загрузки новых изображений
+		image1Path, err := SaveUploadedFile(r, "image1")
+		if err != nil {
+			http.Error(w, "Failed to save image 1", http.StatusInternalServerError)
+			return
+		}
+		image2Path, err := SaveUploadedFile(r, "image2")
+		if err != nil {
+			http.Error(w, "Failed to save image 2", http.StatusInternalServerError)
+			return
+		}
+		image3Path, err := SaveUploadedFile(r, "image3")
+		if err != nil {
+			http.Error(w, "Failed to save image 3", http.StatusInternalServerError)
+			return
+		}
+
+		// Удаление изображений если установлены флаги удаления
+		if r.FormValue("delete_image1") == "on" {
+			image1Path = "DELETE"
+		}
+		if r.FormValue("delete_image2") == "on" {
+			image2Path = "DELETE"
+		}
+		if r.FormValue("delete_image3") == "on" {
+			image3Path = "DELETE"
+		}
+
+		if err := db.UpdateOrDeletePost(dbConn, postID, title, content, image1Path, image2Path, image3Path, false); err != nil {
 			http.Error(w, "Failed to update post", http.StatusInternalServerError)
 			return
 		}

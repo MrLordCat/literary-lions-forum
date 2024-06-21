@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"sort"
+	"time"
 
 	"github.com/russross/blackfriday/v2"
 )
@@ -29,10 +30,27 @@ func Dict(values ...interface{}) (map[string]interface{}, error) {
 	}
 	return dict, nil
 }
+func timeSince(t time.Time) string {
+	now := time.Now()
+	duration := now.Sub(t)
+
+	minutes := int(duration.Minutes())
+	hours := int(duration.Hours())
+	days := hours / 24
+
+	if hours < 24 {
+		if hours > 0 {
+			return fmt.Sprintf("%d hours ago", hours)
+		}
+		return fmt.Sprintf("%d minutes ago", minutes)
+	}
+	return fmt.Sprintf("%d days ago", days)
+}
 func RenderTemplate(w http.ResponseWriter, tmpl string, data PageData) error {
 	log.Println("Starting RenderTemplate")
 
 	funcMap := template.FuncMap{
+		"timeSince":         timeSince,
 		"renderPostContent": RenderPostContent,
 		"dict":              Dict,
 	}
@@ -48,6 +66,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, data PageData) error {
 		filepath.Join("web/templates/home/", "top-usersBlock.html"),
 		filepath.Join("web/templates/", "notifications.html"),
 		filepath.Join("web/templates/", "usersList.html"),
+		filepath.Join("web/templates/", "404.html"),
 		filepath.Join("web/templates/", tmpl),
 	)
 	if err != nil {
@@ -89,6 +108,10 @@ type PageData struct {
 	IsDeleted           bool
 	Sort                string
 	CategoryID          int
+	SearchResults       struct { // Добавим это поле
+		Posts []db.Post
+		Users []db.User
+	}
 }
 
 func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData, error) {
@@ -136,7 +159,7 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 	}
 
 	if options["posts"] {
-		data.Posts, err = db.GetAllPosts(dbConn, 0, 0, "likes")
+		data.Posts, err = db.GetAllPosts(dbConn, 0, 0, "p.created_at DESC")
 		if err != nil {
 			return data, err
 		}

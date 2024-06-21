@@ -21,6 +21,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
 func main() {
 	database := db.InitDB()
 	defer database.Close()
@@ -28,6 +29,7 @@ func main() {
 	r.Use(loggingMiddleware)
 	// Static file server
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("web/static"))))
+	r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads", http.FileServer(http.Dir("uploads"))))
 
 	// Route definitions
 	r.HandleFunc("/", server.MainPageHandler(database)).Methods("GET")
@@ -56,7 +58,7 @@ func main() {
 	r.HandleFunc("/mark-notifications-read", handlers.MarkNotificationsAsReadHandler(database)).Methods("POST")
 	r.HandleFunc("/delete-comment", handlers.EditCommentHandler(database)).Methods("POST")
 	r.HandleFunc("/logout", handlers.LogoutHandler).Methods("POST")
-
+	r.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)
 	// Start server
-	http.ListenAndServe("0.0.0.0:8100", r)
+	http.ListenAndServe("0.0.0.0:8000", r)
 }

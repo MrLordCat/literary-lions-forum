@@ -12,8 +12,8 @@
     max-width: 900px;
 }
 
-.profile-info, .profile-posts, .profile-liked-posts {
-    background-color: white;
+.profile-info,  .profile-liked-posts {
+    background-color: rgba(198, 171, 127, 0.55);
     padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

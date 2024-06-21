@@ -2,7 +2,18 @@
 <link rel="stylesheet" href="/static/css/posts.css">
 <link rel="stylesheet" href="/static/css/buttons.css">
 <link rel="stylesheet" href="/static/css/comments.css">
-    <div class="single-post-section">
-        {{template "posts" .}}
-    </div>
+<div class="single-post-section">
+    {{template "posts" .}}
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const singlePostSection = document.querySelector('.single-post-section');
+        if (singlePostSection) {
+            const postTitle = singlePostSection.querySelector('.posts-title');
+            const sortForm = singlePostSection.querySelector('.sort-form');
+            if (postTitle) postTitle.style.display = 'none';
+            if (sortForm) sortForm.style.display = 'none';
+        }
+    });
+</script>
 {{end}}
