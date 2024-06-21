@@ -8,14 +8,13 @@
     <link rel="stylesheet" href="/static/css/notif.css">
     <link rel="stylesheet" href="/static/css/usersList.css">
     {{block "styles" .}}{{end}}
-    <script src="/static/js/errors.js"></script>
+    <script src="/static/js/errors.js" defer></script>
 </head>
 <body>
     <header>
         <nav class="navbar">
             <a href="/" class="navbar-item">Home</a>
             <a href="/users" class="navbar-item">Users</a>
-          
             <form class="search-form" method="GET" action="/search">
                 <input type="text" name="query" placeholder="Search posts and users..." required>
                 <button type="submit">
@@ -41,7 +40,7 @@
                 <div class="dropdown">
                     <button id="logout" class="navbar-item dropdown-toggle" onclick="toggleDropdown('register-dropdown')">Register</button>
                     <div id="register-dropdown" class="dropdown-content hidden">
-                        <form method="POST" action="/register">
+                        <form id="register-form" method="POST" action="/register">
                             <label for="username">Username:</label>
                             <input type="text" id="username" name="username" required><br>
                             <div id="username-error" class="error-message"></div>
@@ -50,7 +49,7 @@
                             <div id="email-error" class="error-message"></div>
                             <label for="password">Password:</label>
                             <input type="password" id="password" name="password" required><br>
-                            <div id="password-error" class="error-message"></div>
+
                             <button type="submit">Register</button>
                         </form>
                     </div>

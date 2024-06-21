@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"literary-lions-forum/handlers/db"
 	"log"
@@ -42,10 +43,12 @@ func LoginHandler(dbConn *sql.DB) http.HandlerFunc {
 		// Установка сессии для пользователя после успешного входа
 		setSession(user.ID, w)
 
-		// Перенаправление пользователя на главную страницу или страницу профиля
-		http.Redirect(w, r, "/", http.StatusFound)
+		// Возврат JSON ответа об успешном входе
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"message": "Login successful"})
 	}
 }
+
 func setSession(userID int, w http.ResponseWriter) {
 	expiration := time.Now().Add(24 * time.Hour)
 	cookie := http.Cookie{

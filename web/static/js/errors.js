@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById("login-form");
-   
+    const registerForm = document.querySelector("#register-dropdown form");
 
     if (loginForm) {
         loginForm.addEventListener("submit", function (event) {
@@ -34,9 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-});
-document.addEventListener("DOMContentLoaded", function () {
-    const registerForm = document.getElementById("register-form");
+
     if (registerForm) {
         registerForm.addEventListener("submit", function (event) {
             event.preventDefault();
@@ -69,5 +67,4 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-
 });
