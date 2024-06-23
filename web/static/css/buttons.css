@@ -1,4 +1,5 @@
-.btn {
+/* Общие стили для всех кнопок */
+.btn, #postbutton, #postedit {
     background-color: #ff4500;
     color: white;
     border: none;
@@ -6,27 +7,42 @@
     border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    font-family: 'Roboto', sans-serif; /* Общий шрифт */
-    font-size: 1rem; /* Общий размер шрифта */
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-.btn:hover {
+.btn:hover, #postbutton:hover, #postedit:hover {
     background-color: #ff8b60;
 }
 
-#postbutton, #postedit {
-    background-color: #ff4500;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 110px;
-    height: 34px;
+.btn:active, #postbutton:active, #postedit:active {
+    transform: scale(0.95);
+}
+.post-actions button {
+    margin-right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+}
+/* Дополнительные стили для кнопок в блоке постов */
+.post-actions button {
+    margin-right: 0.25rem;
 }
 
-button:hover {
-    background-color: #ff8b60;
+.post-actions button span {
+    margin-left: 0.25rem;
+}
+
+.post-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+button {
+    min-width: 100px; /* Минимальная ширина для кнопок, чтобы они не сжимались */
 }

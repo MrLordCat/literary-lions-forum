@@ -27,8 +27,8 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(data => {
             if (data.success) {
-                document.getElementById(`post-likes-${postID}`).innerText = `Likes: ${data.likes}`;
-                document.getElementById(`post-dislikes-${postID}`).innerText = `Dislikes: ${data.dislikes}`;
+                document.getElementById(`post-likes-${postID}`).innerText = `${data.likes}`;
+                document.getElementById(`post-dislikes-${postID}`).innerText = `${data.dislikes}`;
             } else {
                 alert('Failed to update like/dislike');
             }

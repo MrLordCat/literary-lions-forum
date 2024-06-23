@@ -9,8 +9,12 @@
     padding: 2rem;
     align-items: flex-start;
 }
-
+.posts-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
 .posts-section {
+    transition: transform 0.3s ease;
     flex: 1;
     background-color: rgba(198, 171, 127, 0.55);
     padding: 1rem;

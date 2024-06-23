@@ -1,7 +1,7 @@
 {{define "comments"}}
 <div class="comments-section">
-    <button id="postbutton" class="toggle-comments" data-target="comments-{{.Post.ID}}">Comment</button>
-    <div id="comments-{{.Post.ID}}" class="comments-container hidden">
+    <button id="postbutton" class="toggle-comments" onclick="this.nextElementSibling.classList.toggle('open')">Comments</button>
+    <div id="comments-{{.Post.ID}}" class="comments-container">
         <h4>Comments:</h4>
         {{if .Post.Comments}}
             <ul id="comments-list-{{.Post.ID}}">
@@ -16,7 +16,7 @@
                                 <form method="POST" action="/delete-comment" style="display:inline;">
                                     <input type="hidden" name="comment_id" value="{{.ID}}">
                                     <input type="hidden" name="action" value="delete">
-                                    <button id="postbutton" type="submit">🗑️ Delete Comment</button>
+                                    <button id="postbutton" type="submit">🗑️ Delete </button>
                                 </form>
                             {{end}}
                         </div>
@@ -35,7 +35,8 @@
             <textarea name="content" required placeholder="Add a comment..."></textarea>
             <button id="postbutton" type="submit">Comment</button>
         </form>
-    </div>{{end}}
+        {{end}}
+    </div>
 </div>
 <script src="/static/js/comments.js"></script>
 {{end}}

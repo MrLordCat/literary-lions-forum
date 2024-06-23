@@ -1,12 +1,10 @@
 {{define "postActions"}}
 <div class="post-actions" id="post-actions-{{.Post.ID}}">
-    <span id="post-likes-{{.Post.ID}}">Likes: {{.Post.Likes}}</span>, 
-    <span id="post-dislikes-{{.Post.ID}}">Dislikes: {{.Post.Dislikes}}</span>
     <form onsubmit="handleLike(event, {{.Post.ID}}, 1)" style="display:inline;">
-        <button id="postbutton" type="submit">👍 Like</button>
+        <button id="postbutton" type="submit">👍 Like <span id="post-likes-{{.Post.ID}}">{{.Post.Likes}}</span></button>
     </form>
     <form onsubmit="handleLike(event, {{.Post.ID}}, -1)" style="display:inline;">
-        <button id="postbutton" type="submit">👎 Dislike</button>
+        <button id="postbutton" type="submit">👎 Dislike <span id="post-dislikes-{{.Post.ID}}">{{.Post.Dislikes}}</span></button>
     </form>
     {{if .LoggedIn}}
         {{if or .IsAdmin (eq .User.ID .Post.AuthorID)}}

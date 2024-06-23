@@ -26,10 +26,19 @@ ul li div button {
 
 .comments-container {
     background-color: #ffffffd7;
-    padding: 1rem;
+    padding: 0 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-top: 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, padding-top 0.5s ease-out, padding-bottom 0.5s ease-out;
+}
+
+.comments-container.open {
+    max-height: 1000px; /* Достаточно большое значение, чтобы уместить все содержимое */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
 .button:hover {
