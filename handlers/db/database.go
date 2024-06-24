@@ -3,8 +3,6 @@ package db
 import (
 	"database/sql"
 	"log"
-	"net/http"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -94,14 +92,4 @@ CREATE TABLE IF NOT EXISTS posts (
 	}
 	log.Println("Table posts created successfully or already exists.")
 
-}
-
-func SessionHandler(user User, w http.ResponseWriter) {
-
-	sessionToken := "some_generated_session_token" 
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   sessionToken,
-		Expires: time.Now().Add(120 * time.Minute),
-	})
 }
