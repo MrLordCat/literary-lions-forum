@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"literary-lions-forum/handlers"
 	"literary-lions-forum/handlers/db"
 	"literary-lions-forum/server"
+	"log"
 	"net/http"
 	"path/filepath"
 	"text/template"
@@ -26,17 +28,16 @@ func main() {
 	database := db.InitDB()
 	defer database.Close()
 	r := mux.NewRouter()
-	r.Use(loggingMiddleware)
-	// Static file server
+	r.Use(LoggingMiddleware)
+
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("web/static"))))
 	r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads", http.FileServer(http.Dir("uploads"))))
 
-	// Route definitions
 	r.HandleFunc("/", server.MainPageHandler(database)).Methods("GET")
 	r.HandleFunc("/profile", handlers.UserProfileHandler(database)).Methods("GET")
 	r.HandleFunc("/create-post", handlers.PostCreateFormHandler(database)).Methods("GET", "POST")
 	r.HandleFunc("/register", handlers.RegisterHandler(database)).Methods("GET", "POST")
-	//r.HandleFunc("/posts", handlers.PostsHandler(database)).Methods("GET")
+
 	r.HandleFunc("/users", handlers.UsersHandler(database)).Methods("GET")
 	r.HandleFunc("/login", handlers.LoginHandler(database)).Methods("GET", "POST")
 	r.HandleFunc("/add-comment", handlers.AddCommentHandler(database)).Methods("POST")
@@ -59,6 +60,43 @@ func main() {
 	r.HandleFunc("/delete-comment", handlers.EditCommentHandler(database)).Methods("POST")
 	r.HandleFunc("/logout", handlers.LogoutHandler).Methods("POST")
 	r.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)
-	// Start server
+
 	http.ListenAndServe("0.0.0.0:8000", r)
+}
+
+func LoggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		lw := &loggingResponseWriter{
+			ResponseWriter: w,
+			statusCode:     200,
+		}
+
+		next.ServeHTTP(lw, r)
+
+		log.Printf("[%s] %s %d", r.Method, r.URL.Path, lw.statusCode)
+		if lw.data != nil {
+			logData, _ := json.MarshalIndent(lw.data, "", "  ")
+			log.Printf("Data: %s", logData)
+		}
+	})
+}
+
+type loggingResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+	data       interface{}
+}
+
+func (lrw *loggingResponseWriter) WriteHeader(statusCode int) {
+	lrw.statusCode = statusCode
+	lrw.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (lrw *loggingResponseWriter) Write(data []byte) (int, error) {
+
+	if json.Unmarshal(data, &lrw.data) != nil {
+		lrw.data = nil
+	}
+	return lrw.ResponseWriter.Write(data)
 }

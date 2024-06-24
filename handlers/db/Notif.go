@@ -21,13 +21,11 @@ func GetUnreadNotifications(db *sql.DB, userID int) ([]Notification, error) {
         FROM notifications 
         WHERE user_id = ? AND is_read = 0
     `
-
 	rows, err := db.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
 	var notifications []Notification
 	for rows.Next() {
 		var notification Notification
@@ -37,7 +35,6 @@ func GetUnreadNotifications(db *sql.DB, userID int) ([]Notification, error) {
 		}
 		notifications = append(notifications, notification)
 	}
-
 	return notifications, nil
 }
 

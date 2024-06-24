@@ -19,7 +19,7 @@ func GetCommentByID(db *sql.DB, commentID int) (*Comment, error) {
 	var c Comment
 	err := row.Scan(&c.ID, &c.Content, &c.AuthorID, &c.AuthorName, &c.CreatedAt, &c.Likes)
 	if err == sql.ErrNoRows {
-		return nil, nil // No comment found
+		return nil, nil 
 	}
 	if err != nil {
 		return nil, err
@@ -55,14 +55,14 @@ func GetCommentsForPost(db *sql.DB, postID int) ([]Comment, error) {
 
 func DeleteOrUpdateComment(db *sql.DB, commentID int, newContent string, delete bool) error {
 	if delete {
-		// Если delete == true, удаляем комментарий
+
 		query := `DELETE FROM comments WHERE id = ?`
 		_, err := db.Exec(query, commentID)
 		if err != nil {
 			return fmt.Errorf("error deleting comment: %v", err)
 		}
 	} else {
-		// Если delete == false, обновляем комментарий
+
 		query := `UPDATE comments SET content = ? WHERE id = ?`
 		_, err := db.Exec(query, newContent, commentID)
 		if err != nil {

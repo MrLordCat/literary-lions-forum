@@ -26,7 +26,7 @@ func NotificationHandler(database *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Пометка уведомлений как прочитанных
+		
 		if err := db.MarkNotificationsAsRead(database, userID); err != nil {
 			http.Error(w, "Failed to mark notifications as read: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -34,7 +34,7 @@ func NotificationHandler(database *sql.DB) http.HandlerFunc {
 
 		data.Title = "Notifications"
 
-		log.Printf("Notifications: %+v", data.Notifications) // Логируем полученные уведомления
+		log.Printf("Notifications: %+v", data.Notifications) 
 
 		utils.RenderTemplate(w, "notifications.html", data)
 	}

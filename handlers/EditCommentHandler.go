@@ -32,7 +32,7 @@ func EditCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		comment, err := db.GetCommentByID(dbConn, commentID) // Используем функцию для получения конкретного комментария
+		comment, err := db.GetCommentByID(dbConn, commentID) 
 		if err != nil {
 			http.Error(w, "Failed to get comment", http.StatusInternalServerError)
 			return
@@ -48,8 +48,8 @@ func EditCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Проверка, какое действие нужно выполнить
-		action := r.FormValue("action") // Действие может быть 'delete' или 'update'
+		
+		action := r.FormValue("action") 
 		switch action {
 		case "delete":
 			if err := db.DeleteOrUpdateComment(dbConn, commentID, "", true); err != nil {

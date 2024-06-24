@@ -24,7 +24,7 @@ func handleLike(dbConn *sql.DB, r *http.Request, likeTypeKey, idKey string, isCo
 		return nil, fmt.Errorf("invalid ID")
 	}
 
-	likeType, err := strconv.Atoi(r.FormValue(likeTypeKey)) // 1 for like, -1 for dislike
+	likeType, err := strconv.Atoi(r.FormValue(likeTypeKey)) 
 	if err != nil || (likeType != 1 && likeType != -1) {
 		return nil, fmt.Errorf("invalid like type")
 	}
@@ -72,7 +72,7 @@ func LikeHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		post := result.(db.Post)
 
-		// Возвращаем JSON ответ
+		
 		response := map[string]interface{}{
 			"success":  true,
 			"likes":    post.Likes,
@@ -94,7 +94,7 @@ func LikeCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		comment := result.(*db.Comment)
 
-		// Возвращаем JSON ответ
+		
 		response := map[string]interface{}{
 			"success": true,
 			"likes":   comment.Likes,

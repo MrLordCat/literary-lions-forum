@@ -9,14 +9,14 @@ import (
 func SearchAll(db *sql.DB, query string) (SearchResult, error) {
 	var result SearchResult
 
-	// Поиск постов по названию или содержанию
+	
 	posts, err := SearchPosts(db, query)
 	if err != nil {
 		return result, err
 	}
 	result.Posts = posts
 
-	// Поиск пользователей по имени пользователя или email
+	
 	users, err := SearchUsers(db, query)
 	if err != nil {
 		return result, err
@@ -26,7 +26,7 @@ func SearchAll(db *sql.DB, query string) (SearchResult, error) {
 	return result, nil
 }
 func SearchPosts(db *sql.DB, searchText string) ([]Post, error) {
-	// Используйте searchText для модификации SQL запроса
+	
 	posts := []Post{}
 	query := `SELECT p.id, p.title, p.content, u.username AS author_name, p.author_id, p.created_at, p.category_id,
 	COALESCE(SUM(CASE WHEN pl.like_type = 1 THEN 1 ELSE 0 END), 0) AS likes,
@@ -38,7 +38,7 @@ func SearchPosts(db *sql.DB, searchText string) ([]Post, error) {
 	GROUP BY p.id, p.title, p.content, u.username, p.author_id, p.created_at
 	ORDER BY p.created_at DESC
 	`
-	// Используйте '%' + searchText + '%' для LIKE условий
+	
 	rows, err := db.Query(query, "%"+searchText+"%", "%"+searchText+"%")
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func SearchPosts(db *sql.DB, searchText string) ([]Post, error) {
 }
 
 func SearchUsers(db *sql.DB, searchText string) ([]User, error) {
-	// Используйте searchText для модификации SQL запроса
+	
 	query := `SELECT id, username, email, created_at FROM users
 	WHERE LOWER(username) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?)
 	

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"database/sql" // Импортируем твой пакет db
+	"database/sql" 
 	"fmt"
 	"literary-lions-forum/handlers/db"
 	"literary-lions-forum/utils"
@@ -13,7 +13,7 @@ func PostCreateFormHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			// Отображение страницы создания поста
+			
 			userID, err := GetUserIDFromSession(r)
 			if err != nil {
 				http.Error(w, "You need to be logged in to create a post", http.StatusUnauthorized)
@@ -32,7 +32,7 @@ func PostCreateFormHandler(dbConn *sql.DB) http.HandlerFunc {
 			utils.RenderTemplate(w, "/post/createPost.html", data)
 
 		case "POST":
-			// Получение ID пользователя из сессии
+			
 			userID, err := GetUserIDFromSession(r)
 			if err != nil {
 				http.Error(w, "Failed to get user ID from session", http.StatusInternalServerError)
@@ -43,7 +43,7 @@ func PostCreateFormHandler(dbConn *sql.DB) http.HandlerFunc {
 				return
 			}
 
-			// Получение данных из формы
+			
 			title := r.FormValue("title")
 			content := r.FormValue("content")
 			categoryIDString := r.FormValue("category_id")
@@ -53,7 +53,7 @@ func PostCreateFormHandler(dbConn *sql.DB) http.HandlerFunc {
 				return
 			}
 
-			// Сохранение изображений
+			
 			imagePaths := make([]string, 3)
 			for i := 0; i < 3; i++ {
 				formFile := fmt.Sprintf("image%d", i+1)
@@ -63,7 +63,7 @@ func PostCreateFormHandler(dbConn *sql.DB) http.HandlerFunc {
 				}
 			}
 
-			// Создание поста с учетом изображений
+			
 			if err := db.CreatePost(dbConn, title, content, userID, categoryID, imagePaths[0], imagePaths[1], imagePaths[2]); err != nil {
 				http.Error(w, "Failed to save post: "+err.Error(), http.StatusInternalServerError)
 				return
@@ -74,7 +74,7 @@ func PostCreateFormHandler(dbConn *sql.DB) http.HandlerFunc {
 				http.Error(w, "Failed to retrieve post ID: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
-			// Перенаправление на главную страницу после успешного создания
+			
 			http.Redirect(w, r, "/postView?postID="+strconv.Itoa(postID), http.StatusFound)
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}

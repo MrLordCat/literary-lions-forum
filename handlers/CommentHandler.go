@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-// Функция для добавления комментария в базу данных
+
 func AddComment(db *sql.DB, postID, authorID int, content string) (int, error) {
 	result, err := db.Exec("INSERT INTO comments (post_id, author_id, content) VALUES (?, ?, ?)", postID, authorID, content)
 	if err != nil {
@@ -53,14 +53,14 @@ func AddCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Получаем новый комментарий
+		
 		newComment, err := db.GetCommentByID(dbConn, commentID)
 		if err != nil {
 			http.Error(w, "Failed to fetch new comment", http.StatusInternalServerError)
 			return
 		}
 
-		// Создаем уведомление для автора поста
+		
 		authorPosts, err := db.GetAllPosts(dbConn, postID, 0, "likes")
 		if err != nil {
 			http.Error(w, "Failed to get post author", http.StatusInternalServerError)
@@ -80,7 +80,7 @@ func AddCommentHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Возвращаем JSON-ответ с новым комментарием
+		
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(newComment)
 	}

@@ -11,14 +11,14 @@ func SaveUploadedFile(r *http.Request, formField string) (string, error) {
 	file, header, err := r.FormFile(formField)
 	if err != nil {
 		if err == http.ErrMissingFile {
-			return "", nil // Если файл не был загружен, возвращаем пустую строку
+			return "", nil 
 		}
 		return "", err
 	}
 	defer file.Close()
 
 	if header == nil || header.Filename == "" {
-		return "", nil // Если файл не был загружен, возвращаем пустую строку
+		return "", nil 
 	}
 
 	filePath := filepath.Join("uploads", header.Filename)

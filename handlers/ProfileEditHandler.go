@@ -50,19 +50,19 @@ func UpdateProfileHandler(dbConn *sql.DB) http.HandlerFunc {
 		newPassword := r.FormValue("newPassword")
 		confirmPassword := r.FormValue("confirmPassword")
 
-		// Проверка текущего пароля
+		
 		if !db.CheckCurrentPassword(dbConn, userID, currentPassword) {
 			http.Error(w, "Current password is incorrect", http.StatusForbidden)
 			return
 		}
 
-		// Проверка, что новый пароль и подтверждение совпадают
+		
 		if newPassword != "" && newPassword != confirmPassword {
 			http.Error(w, "New passwords do not match", http.StatusBadRequest)
 			return
 		}
 
-		// Обновление профиля пользователя
+		
 		if err := db.UpdateUser(dbConn, userID, username, firstName, lastName, newPassword); err != nil {
 			http.Error(w, "Failed to update user profile", http.StatusInternalServerError)
 			return

@@ -1,0 +1,15 @@
+# Ignore the executable
+main
+
+# Ignore build artifacts
+*.out
+
+# Ignore local Go environment files
+*.env
+
+# Ignore Go build cache
+vendor/
+
+# Ignore version control files and directories
+.git
+.gitignore

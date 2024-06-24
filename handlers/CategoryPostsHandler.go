@@ -20,11 +20,11 @@ func CategoryPostsHandler(dbConn *sql.DB) http.HandlerFunc {
 		var categoryID int
 		var err error
 
-		// Попытка найти ID по имени категории
+		
 		query := "SELECT id FROM categories WHERE name = ?"
 		err = db.QueryRow(dbConn, query, []interface{}{categoryIDStr}, &categoryID)
 		if err != nil {
-			// Если не удалось найти по имени, пробуем конвертировать строку в int
+			
 			categoryID, err = strconv.Atoi(categoryIDStr)
 			if err != nil {
 				http.Error(w, "Invalid category ID or name", http.StatusBadRequest)
@@ -65,7 +65,7 @@ func CategoryPostsHandler(dbConn *sql.DB) http.HandlerFunc {
 		pageData.Posts = posts
 		pageData.Title = "Sorted Posts by Category"
 		pageData.Sort = sort
-		pageData.CategoryID = categoryID // добавляем ID категории в данные страницы
+		pageData.CategoryID = categoryID 
 
 		err = utils.RenderTemplate(w, "post/sortedPosts.html", pageData)
 		if err != nil {

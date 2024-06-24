@@ -29,7 +29,7 @@ func EditPostHandler(dbConn *sql.DB) http.HandlerFunc {
 		}
 		post := posts[0]
 
-		// Проверка, что пост можно редактировать
+		
 		canEdit := false
 
 		loggedInUserID, err := GetUserIDFromSession(r)
@@ -102,7 +102,7 @@ func UpdatePostHandler(dbConn *sql.DB) http.HandlerFunc {
 		}
 
 		if r.FormValue("action") == "delete" {
-			// Обрабатываем удаление поста
+			
 			if err := db.UpdateOrDeletePost(dbConn, postID, "", "", "", "", "", true); err != nil {
 				http.Error(w, "Failed to delete post", http.StatusInternalServerError)
 				return
@@ -111,11 +111,11 @@ func UpdatePostHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Обрабатываем обновление поста
+		
 		title := r.FormValue("title")
 		content := r.FormValue("content")
 
-		// Обработка загрузки новых изображений
+		
 		image1Path, err := SaveUploadedFile(r, "image1")
 		if err != nil {
 			http.Error(w, "Failed to save image 1", http.StatusInternalServerError)
@@ -132,7 +132,7 @@ func UpdatePostHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Удаление изображений если установлены флаги удаления
+		
 		if r.FormValue("delete_image1") == "on" {
 			image1Path = "DELETE"
 		}

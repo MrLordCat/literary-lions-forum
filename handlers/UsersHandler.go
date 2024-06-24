@@ -10,7 +10,7 @@ import (
 
 func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Получаем ID пользователя из сессии, если вход выполнен
+		
 		userID, _ := GetUserIDFromSession(r)
 
 		users, err := db.GetAllUsers(dbConn)
@@ -19,7 +19,7 @@ func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Сортируем пользователей по карме по умолчанию
+		
 		sortBy := r.URL.Query().Get("sort")
 		if sortBy == "" || sortBy == "karma" {
 			sort.Slice(users, func(i, j int) bool {
@@ -35,7 +35,7 @@ func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 			})
 		}
 
-		// Получаем топ 10 пользователей по карме
+		
 		topUsers := users
 		if len(users) > 10 {
 			topUsers = users[:10]
@@ -52,7 +52,7 @@ func UsersHandler(dbConn *sql.DB) http.HandlerFunc {
 
 		pageData.Title = "Users"
 		pageData.Users = users
-		pageData.TopUsers = topUsers // Добавляем топ пользователей
+		pageData.TopUsers = topUsers 
 
 		err = utils.RenderTemplate(w, "usersList.html", pageData)
 		if err != nil {

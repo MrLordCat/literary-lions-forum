@@ -40,7 +40,7 @@ type Comment struct {
 	AuthorID   int
 	Content    string
 	CreatedAt  time.Time
-	Likes      int // Добавляем поле для хранения количества лайков
+	Likes      int 
 }
 
 type Category struct {

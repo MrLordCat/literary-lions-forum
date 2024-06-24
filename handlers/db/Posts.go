@@ -139,14 +139,14 @@ func GetPostsByCategory(db *sql.DB, categoryID int, sort string) ([]Post, error)
 
 func UpdateOrDeletePost(db *sql.DB, postID int, title, content, image1Path, image2Path, image3Path string, delete bool) error {
 	if delete {
-		// Устанавливаем пост как удаленный и очищаем содержимое
+		
 		query := `UPDATE posts SET title = '', content = '', is_deleted = 1 WHERE id = ?`
 		_, err := db.Exec(query, postID)
 		if err != nil {
 			return fmt.Errorf("error marking post as deleted: %v", err)
 		}
 	} else {
-		// Обновляем пост с новым заголовком, содержимым и изображениями
+		
 		fmt.Println(image1Path)
 		query := `UPDATE posts SET title = ?, content = ?, 
             image1_path = CASE WHEN ? = 'DELETE' THEN NULL WHEN ? != '' THEN ? ELSE image1_path END, 

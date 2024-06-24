@@ -1,4 +1,4 @@
-// utils/templates.go
+
 package utils
 
 import (
@@ -108,7 +108,7 @@ type PageData struct {
 	IsDeleted           bool
 	Sort                string
 	CategoryID          int
-	SearchResults       struct { // Добавим это поле
+	SearchResults       struct { 
 		Posts []db.Post
 		Users []db.User
 	}
@@ -122,7 +122,7 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 		data.User, err = db.GetUserByID(dbConn, userID)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				// Если пользователь не найден, продолжим выполнение без установки LoggedIn
+				
 				data.LoggedIn = false
 			} else {
 				return data, err
@@ -177,7 +177,7 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 		if err != nil {
 			return data, err
 		}
-		// Сортируем пользователей по карме
+		
 		sort.Slice(users, func(i, j int) bool {
 			karmaI := int64(0)
 			if users[i].Karma.Valid {
@@ -190,7 +190,7 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 			return karmaI > karmaJ
 		})
 
-		// Получаем топ 10 пользователей
+		
 		if len(users) > 10 {
 			data.TopUsers = users[:10]
 		} else {
@@ -211,7 +211,7 @@ func GetPageData(dbConn *sql.DB, userID int, options map[string]bool) (PageData,
 			data.Post = posts[0]
 		}
 	}
-	// Установка значения IsProfile
+	
 	if options["isProfile"] {
 		data.IsProfile = true
 	}
@@ -240,7 +240,7 @@ func RenderPostContent(content string) template.HTML {
 
 	output := blackfriday.Run([]byte(content), blackfriday.WithRenderer(renderer), blackfriday.WithExtensions(extensions))
 
-	// Оборачиваем результат в <div> с стилем white-space: pre-wrap
+	
 	htmlContent := fmt.Sprintf("<div style=\"white-space: pre-wrap;\">%s</div>", output)
 	return template.HTML(htmlContent)
 }

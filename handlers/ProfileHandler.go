@@ -29,7 +29,7 @@ func UserProfileHandler(dbConn *sql.DB) http.HandlerFunc {
 		}
 
 		data.IsOwnProfile = true
-		data.IsProfile = true // Установка флага IsProfile
+		data.IsProfile = true 
 		data.Posts = data.UserPosts
 
 		utils.RenderTemplate(w, "profile/profile.html", data)

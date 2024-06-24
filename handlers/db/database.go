@@ -97,8 +97,8 @@ CREATE TABLE IF NOT EXISTS posts (
 }
 
 func SessionHandler(user User, w http.ResponseWriter) {
-	// Создание сессионной куки
-	sessionToken := "some_generated_session_token" // Реальная токен нужно генерировать безопасно
+
+	sessionToken := "some_generated_session_token" 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   sessionToken,

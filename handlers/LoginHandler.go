@@ -33,17 +33,17 @@ func LoginHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Сравнение предоставленного пароля с хэшированным паролем в базе данных
+		
 		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 		if err != nil {
 			ErrorHandler(w, http.StatusUnauthorized, "Invalid password")
 			return
 		}
 
-		// Установка сессии для пользователя после успешного входа
+		
 		setSession(user.ID, w)
 
-		// Возврат JSON ответа об успешном входе
+		
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"message": "Login successful"})
 	}
@@ -56,18 +56,18 @@ func setSession(userID int, w http.ResponseWriter) {
 		Value:    strconv.Itoa(userID),
 		Expires:  expiration,
 		HttpOnly: true,
-		Secure:   false, // Этот флаг следует включать, если вы используете HTTPS
+		Secure:   false, 
 	}
 	http.SetCookie(w, &cookie)
 }
 func GetUserIDFromSession(r *http.Request) (int, error) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
-		return 0, err // Ошибка, если куки нет
+		return 0, err 
 	}
-	userID, err := strconv.Atoi(cookie.Value) // Преобразование значения куки обратно в int
+	userID, err := strconv.Atoi(cookie.Value) 
 	if err != nil {
-		return 0, err // Ошибка, если значение не является целым числом
+		return 0, err 
 	}
 	return userID, nil
 }
@@ -79,16 +79,16 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Удаление сессионной куки
+	
 	cookie := http.Cookie{
 		Name:     "session_token",
 		Value:    "",
 		Expires:  time.Unix(0, 0),
 		HttpOnly: true,
-		Secure:   false, // Включите для HTTPS
+		Secure:   false, 
 	}
 	http.SetCookie(w, &cookie)
 
-	// Перенаправление на страницу входа или на главную страницу
+	
 	http.Redirect(w, r, "/", http.StatusFound)
 }

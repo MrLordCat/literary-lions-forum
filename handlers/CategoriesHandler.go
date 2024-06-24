@@ -32,7 +32,7 @@ func CreateCategoryHandler(dbConn *sql.DB) http.HandlerFunc {
 				return
 			}
 
-			// Добавление категории в базу данных
+			
 			if err := db.CreateCategory(dbConn, categoryName); err != nil {
 				http.Error(w, "Failed to create category", http.StatusInternalServerError)
 				return
@@ -46,7 +46,7 @@ func CreateCategoryHandler(dbConn *sql.DB) http.HandlerFunc {
 				return
 			}
 
-			// Удаление категории из базы данных
+			
 			if err := db.DeleteCategory(dbConn, categoryName); err != nil {
 				http.Error(w, "Failed to delete category", http.StatusInternalServerError)
 				return

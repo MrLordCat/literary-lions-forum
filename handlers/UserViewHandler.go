@@ -1,10 +1,10 @@
-// handlers/UserViewHandler.go
+
 
 package handlers
 
 import (
 	"database/sql"
-	"literary-lions-forum/handlers/db" // Импортируйте ваш пакет db, проверьте правильность пути
+	"literary-lions-forum/handlers/db" 
 	"literary-lions-forum/utils"
 	"net/http"
 	"strconv"
@@ -20,7 +20,7 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		userIDStr := segments[2] // предполагается, что URL в формате /user/{userID}
+		userIDStr := segments[2] 
 		userID, err := strconv.Atoi(userIDStr)
 		if err != nil {
 			http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -38,7 +38,7 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 			"notifications": true,
 		}
 
-		// Получаем данные для профиля другого пользователя
+		
 		data, err := utils.GetPageData(dbConn, loggedInUserID, options)
 		if err != nil {
 			http.Error(w, "Failed to fetch data: "+err.Error(), http.StatusInternalServerError)
@@ -66,7 +66,7 @@ func UserViewHandler(dbConn *sql.DB) http.HandlerFunc {
 		data.Title = user.Username + "'s Profile"
 		data.User = user
 		data.IsOwnProfile = isOwnProfile
-		data.Posts = userPosts // Обновляем с постами пользователя
+		data.Posts = userPosts 
 		data.LikedPosts = likedPosts
 
 		data.LoggedIn = loggedInUserID > 0

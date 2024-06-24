@@ -11,7 +11,7 @@ import (
 )
 
 func CreateUser(db *sql.DB, username, email, password string, isAdmin bool) error {
-	// Проверка формата email
+	
 	fmt.Println("EMAIL +++", email)
 	_, err := mail.ParseAddress(email)
 
@@ -30,7 +30,7 @@ func CreateUser(db *sql.DB, username, email, password string, isAdmin bool) erro
 
 func GetUserByUsernameOrEmail(db *sql.DB, login string) (User, error) {
 	var user User
-	// Обновлённый SQL запрос для поиска по username или email
+	
 	query := "SELECT id, username, email, password_hash FROM users WHERE username = ? OR email = ?"
 	err := db.QueryRow(query, login, login).Scan(&user.ID, &user.Username, &user.Email, &user.PasswordHash)
 	if err != nil {
